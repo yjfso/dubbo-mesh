@@ -1,8 +1,11 @@
 package com.alibaba.dubbo.performance.demo.agent.registry;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Endpoint {
     private final String host;
     private final int port;
+    private AtomicInteger requestNum = new AtomicInteger(0);
 
     public Endpoint(String host,int port){
         this.host = host;
