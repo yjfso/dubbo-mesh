@@ -4,6 +4,7 @@ import com.alibaba.dubbo.performance.demo.agent.dubbo.RpcClient;
 import com.alibaba.dubbo.performance.demo.agent.registry.Endpoint;
 import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.demo.agent.registry.IRegistry;
+import com.alibaba.dubbo.performance.demo.agent.registry.LoadBalance;
 import com.alibaba.fastjson.JSON;
 import okhttp3.*;
 import org.apache.http.HttpEntity;
@@ -30,12 +31,10 @@ public class HelloController {
 
     private Logger logger = LoggerFactory.getLogger(HelloController.class);
     
-    private IRegistry registry = new EtcdRegistry(System.getProperty("etcd.url"));
+    private IRegistry registry = EtcdRegistry.registry;
 
     private RpcClient rpcClient = new RpcClient(registry);
-    private Random random = new Random();
-    private List<Endpoint> endpoints = null;
-    private Object lock = new Object();
+
     private OkHttpClient httpClient = new OkHttpClient();
 
 
@@ -63,16 +62,7 @@ public class HelloController {
 
     public Integer consumer(String interfaceName,String method,String parameterTypesString,String parameter) throws Exception {
 
-        if (null == endpoints){
-            synchronized (lock){
-                if (null == endpoints){
-                    endpoints = registry.find("com.alibaba.dubbo.performance.demo.provider.IHelloService");
-                }
-            }
-        }
-
-        // 简单的负载均衡，随机取一个
-        Endpoint endpoint = endpoints.get(random.nextInt(endpoints.size()));
+        Endpoint endpoint = LoadBalance.getEndpoint().request();
 
         String url =  "http://" + endpoint.getHost() + ":" + endpoint.getPort();
 
@@ -89,6 +79,7 @@ public class HelloController {
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
+            endpoint.response();
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
             byte[] bytes = response.body().bytes();
             return JSON.parseObject(bytes, Integer.class);
