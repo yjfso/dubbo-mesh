@@ -8,44 +8,27 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
+
 public class ConnecManager {
     private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
 
     private Bootstrap bootstrap;
 
     private Channel channel;
-    private Object lock = new Object();
 
     public ConnecManager() {
+        initBootstrap();
     }
 
     public Channel getChannel() throws Exception {
-        if (null != channel) {
-            return channel;
-        }
-
-        if (null == bootstrap) {
-            synchronized (lock) {
-                if (null == bootstrap) {
-                    initBootstrap();
-                }
-            }
-        }
-
-        if (null == channel) {
-            synchronized (lock){
-                if (null == channel){
-                    int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
-                    channel = bootstrap.connect("127.0.0.1", port).sync().channel();
-                }
-            }
-        }
-
         return channel;
     }
 
     public void initBootstrap() {
-
         bootstrap = new Bootstrap()
                 .group(eventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -53,5 +36,11 @@ public class ConnecManager {
                 .option(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
                 .channel(NioSocketChannel.class)
                 .handler(new RpcClientInitializer());
+        int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
+        try{
+            channel = bootstrap.connect("127.0.0.1", port).sync().channel();
+        } catch (Exception e){
+
+        }
     }
 }

@@ -21,12 +21,14 @@ public class EtcdRegistry implements IRegistry{
     // 添加watch，在本地内存缓存地址列表，可减少网络调用的次数
     // 使用的是简单的随机负载均衡，如果provider性能不一致，随机策略会影响性能
 
+    public final static IRegistry registry = new EtcdRegistry(System.getProperty("etcd.url"));
     private final String rootPath = "dubbomesh";
     private Lease lease;
     private KV kv;
     private long leaseId;
 
-    public EtcdRegistry(String registryAddress) {
+    private EtcdRegistry(String registryAddress) {
+        System.out.println(System.getProperty("etcd.url"));
         Client client = Client.builder().endpoints(registryAddress).build();
         this.lease   = client.getLeaseClient();
         this.kv      = client.getKVClient();
