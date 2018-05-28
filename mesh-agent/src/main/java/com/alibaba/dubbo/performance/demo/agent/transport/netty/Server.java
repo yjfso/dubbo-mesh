@@ -18,12 +18,13 @@ public class Server {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        int port = Integer.valueOf(System.getProperty("server.port"));
         ChannelFuture future = serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ServiceInitializer())
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .bind(new InetSocketAddress("172.23.162.39", 15530)).sync();
+                .bind(new InetSocketAddress(port)).sync();
 
     }
 }

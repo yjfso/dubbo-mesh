@@ -27,12 +27,6 @@ public class Client {
 
     private Bootstrap bootstrap;
 
-    private Channel channel;
-
-
-    public Channel getChannel() throws Exception {
-        return channel;
-    }
 
     public Client() {
         bootstrap = new Bootstrap()
@@ -42,24 +36,21 @@ public class Client {
                 .option(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
                 .channel(NioSocketChannel.class)
                 .handler(new ClientInitializer());
-        try{
-            Endpoint endpoint = LoadBalance.getEndpoint();
-            channel = bootstrap.connect(new InetSocketAddress(endpoint.getHost(), endpoint.getPort())).sync().channel();
-        } catch (Exception e){
-
-        }
     }
 
     public Object invoke(Request request) throws Exception {
+        Endpoint endpoint = LoadBalance.getEndpoint();
+        Channel channel = endpoint.getChannel(bootstrap);
 
         RpcFuture future = new RpcFuture();
         RequestHolder.put(String.valueOf(request.getId()),future);
 
+        endpoint.request();
         channel.writeAndFlush(request);
-
         Object result = null;
         try {
             result = future.get();
+            endpoint.response();
         }catch (Exception e){
             e.printStackTrace();
         }
