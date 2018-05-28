@@ -15,15 +15,15 @@ public class LoadBalance {
     }
 
     public static Endpoint getEndpoint(){
-        return new Endpoint("127.0.0.1", 20001);
-//        Integer minNum = 9999;
-//        Endpoint endpoint = null;
-//        for (Endpoint item : endpoints) {
-//            int requestNum = item.getRequestNum();
-//            if( requestNum < minNum){
-//                endpoint = item;
-//            }
-//        }
-//        return endpoint;
+//        return new Endpoint("127.0.0.1", 20001);
+        Integer minNum = 9999;
+        Endpoint endpoint = null;
+        for (Endpoint item : endpoints) {
+            int requestNum = item.getRequestNum();
+            if( requestNum < minNum){
+                endpoint = item;
+            }
+        }
+        return endpoint;
     }
 }

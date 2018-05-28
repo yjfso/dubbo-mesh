@@ -54,6 +54,8 @@ public class RpcClient {
         Object result = null;
         try {
             result = future.get();
+            System.out.println("service got a dubbo response");
+            System.out.println(result);
         }catch (Exception e){
             e.printStackTrace();
         }

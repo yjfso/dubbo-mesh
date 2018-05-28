@@ -23,7 +23,7 @@ public class Server {
                 .childHandler(new ServiceInitializer())
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .bind(new InetSocketAddress(15530)).sync();
+                .bind(new InetSocketAddress("172.23.162.39", 15530)).sync();
 
     }
 }

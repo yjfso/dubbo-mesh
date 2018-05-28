@@ -2,6 +2,8 @@ package com.alibaba.dubbo.performance.demo.agent.transport.netty;
 
 import com.alibaba.dubbo.performance.demo.agent.dubbo.RpcClientInitializer;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.*;
+import com.alibaba.dubbo.performance.demo.agent.registry.Endpoint;
+import com.alibaba.dubbo.performance.demo.agent.registry.LoadBalance;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.*;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
 import io.netty.bootstrap.Bootstrap;
@@ -41,7 +43,8 @@ public class Client {
                 .channel(NioSocketChannel.class)
                 .handler(new ClientInitializer());
         try{
-            channel = bootstrap.connect(new InetSocketAddress("127.0.0.1", 15530)).sync().channel();
+            Endpoint endpoint = LoadBalance.getEndpoint();
+            channel = bootstrap.connect(new InetSocketAddress(endpoint.getHost(), endpoint.getPort())).sync().channel();
         } catch (Exception e){
 
         }

@@ -1,6 +1,8 @@
 package com.alibaba.dubbo.performance.demo.agent.dubbo.model;
 
-public class RpcResponse {
+import java.io.Serializable;
+
+public class RpcResponse implements Serializable {
 
     private String requestId;
     private byte[] bytes;
