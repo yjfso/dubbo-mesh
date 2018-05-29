@@ -3,18 +3,11 @@ package com.alibaba.dubbo.performance.demo.agent.transport.netty;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.*;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
-import com.alibaba.dubbo.performance.demo.agent.registry.LoadBalance;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.*;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ConnectManager;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
+
 
 /**
  * Created by yinjianfeng on 18/5/27.
