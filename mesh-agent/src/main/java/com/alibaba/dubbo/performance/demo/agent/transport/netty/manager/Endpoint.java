@@ -1,17 +1,21 @@
-package com.alibaba.dubbo.performance.demo.agent.registry;
+package com.alibaba.dubbo.performance.demo.agent.transport.netty.manager;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Endpoint {
     private final String host;
     private final int port;
     private final AtomicInteger requestNum = new AtomicInteger(0);
-    private Channel channel;
+
     private Object lock = new Object();
+    private Bootstrap bootstrap;
+    private ChannelRing channelRing = new ChannelRing();
+    private Iterator<Channel> iterator = channelRing.iterator();
 
     public Endpoint(String host,int port){
         this.host = host;
@@ -35,6 +39,10 @@ public class Endpoint {
         return host;
     }
 
+    public InetSocketAddress getInetSocketAddress(){
+        return new InetSocketAddress(host, port);
+    }
+
     public int getPort() {
         return port;
     }
@@ -55,14 +63,24 @@ public class Endpoint {
         return host.hashCode() + port;
     }
 
-    public Channel getChannel(Bootstrap bootstrap) throws Exception{
-        if (channel == null){
+    public void setBootstrap(Bootstrap bootstrap){
+        this.bootstrap = bootstrap;
+    }
+    public Channel getChannel() throws Exception{
+        if (!iterator.hasNext()){
             synchronized (lock){
-                if (channel == null){
-                    channel = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort())).sync().channel();
+                if (!iterator.hasNext()){
+                    for (Integer i=0; i<10; i++){
+                        channelRing.put(
+                                bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
+                                        .sync()
+                                        .channel()
+                        );
+                    }
                 }
             }
         }
-        return this.channel;
+        return iterator.next();
     }
+
 }

@@ -1,5 +1,7 @@
 package com.alibaba.dubbo.performance.demo.agent.registry;
 
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
+
 import java.util.List;
 
 public class LoadBalance {

@@ -6,11 +6,12 @@ import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcFuture;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcInvocation;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcRequestHolder;
 
-import com.alibaba.dubbo.performance.demo.agent.registry.IRegistry;
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ClientConnectManager;
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ConnectManager;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -19,15 +20,20 @@ import java.io.PrintWriter;
 public class RpcClient {
     private Logger logger = LoggerFactory.getLogger(RpcClient.class);
 
-    private ConnecManager connectManager;
+    private ConnectManager connectManager;
 
     public RpcClient(){
-        this.connectManager = new ConnecManager();
+        int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
+        this.connectManager = new ClientConnectManager(
+                new RpcClientInitializer()
+        ).addEndpoint(
+                new Endpoint("127.0.0.1", port)
+        );
     }
 
     public Object invoke(String interfaceName, String method, String parameterTypesString, String parameter) throws Exception {
 
-        Channel channel = connectManager.getChannel();
+        Channel channel = connectManager.getEndpoint().getChannel();
 
         RpcInvocation invocation = new RpcInvocation();
         invocation.setMethodName(method);
@@ -54,8 +60,6 @@ public class RpcClient {
         Object result = null;
         try {
             result = future.get();
-            System.out.println("service got a dubbo response");
-            System.out.println(result);
         }catch (Exception e){
             e.printStackTrace();
         }

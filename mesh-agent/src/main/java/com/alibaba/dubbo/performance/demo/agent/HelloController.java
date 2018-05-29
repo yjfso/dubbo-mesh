@@ -1,10 +1,5 @@
 package com.alibaba.dubbo.performance.demo.agent;
 
-import com.alibaba.dubbo.performance.demo.agent.dubbo.RpcClient;
-import com.alibaba.dubbo.performance.demo.agent.registry.Endpoint;
-import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
-import com.alibaba.dubbo.performance.demo.agent.registry.IRegistry;
-import com.alibaba.dubbo.performance.demo.agent.registry.LoadBalance;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.Client;
 import org.slf4j.Logger;
@@ -13,16 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Random;
-
 @RestController
 public class HelloController {
 
     private Logger logger = LoggerFactory.getLogger(HelloController.class);
 
     Client client = new Client();
+
+    public HelloController() throws Exception {
+    }
 
     @RequestMapping(value = "")
     public Object invoke(@RequestParam("interface") String interfaceName,

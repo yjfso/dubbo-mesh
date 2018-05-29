@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.demo.agent.registry;
 
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.coreos.jetcd.Client;
 import com.coreos.jetcd.KV;
 import com.coreos.jetcd.Lease;
@@ -90,6 +91,7 @@ public class EtcdRegistry implements IRegistry{
 
             String host = endpointStr.split(":")[0];
             int port = Integer.valueOf(endpointStr.split(":")[1]);
+            System.out.println("service:" + host + ":" + port);
 
             endpoints.add(new Endpoint(host,port));
         }
