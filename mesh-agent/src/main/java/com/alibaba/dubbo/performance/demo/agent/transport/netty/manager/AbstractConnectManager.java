@@ -22,6 +22,7 @@ public abstract class AbstractConnectManager implements ConnectManager {
         for (Endpoint item : endpoints) {
             int requestNum = item.getRequestNum();
             if( requestNum < minNum){
+                minNum = requestNum;
                 endpoint = item;
             }
         }

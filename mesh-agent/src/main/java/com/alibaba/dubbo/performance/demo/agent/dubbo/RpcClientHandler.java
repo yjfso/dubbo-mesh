@@ -18,4 +18,9 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             future.done(response);
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.fireExceptionCaught(cause);
+    }
 }

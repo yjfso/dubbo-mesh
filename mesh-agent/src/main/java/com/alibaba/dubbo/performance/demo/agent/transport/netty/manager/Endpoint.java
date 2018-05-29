@@ -11,6 +11,7 @@ public class Endpoint {
     private final String host;
     private final int port;
     private final AtomicInteger requestNum = new AtomicInteger(0);
+    private int request = 0;
 
     private Object lock = new Object();
     private Bootstrap bootstrap;
@@ -23,16 +24,17 @@ public class Endpoint {
     }
 
     public Endpoint request(){
-        requestNum.incrementAndGet();
+        request = requestNum.incrementAndGet();
         return this;
     }
     public Endpoint response(){
-        requestNum.decrementAndGet();
+        request = requestNum.decrementAndGet();
         return this;
     }
 
     public Integer getRequestNum(){
-        return requestNum.get();
+        System.out.println(request);
+        return request;
     }
 
     public String getHost() {
@@ -70,7 +72,7 @@ public class Endpoint {
         if (!iterator.hasNext()){
             synchronized (lock){
                 if (!iterator.hasNext()){
-                    for (Integer i=0; i<10; i++){
+                    for (Integer i=0; i<50; i++){
                         channelRing.put(
                                 bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
                                         .sync()
