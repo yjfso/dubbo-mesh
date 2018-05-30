@@ -27,6 +27,7 @@ public class Client {
     public Object invoke(Request request) throws Exception {
         Endpoint endpoint = connectManager.getEndpoint();
 
+
         RpcFuture future = new RpcFuture();
         RequestHolder.put(String.valueOf(request.getId()),future);
 

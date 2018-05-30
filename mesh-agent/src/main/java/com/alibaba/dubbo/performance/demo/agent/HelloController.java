@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 public class HelloController {
 
     private Logger logger = LoggerFactory.getLogger(HelloController.class);
 
     Client client = new Client();
+//    private OkHttpClient httpClient = new OkHttpClient();
+//    private RpcClient rpcClient = new RpcClient();
 
     public HelloController() throws Exception {
     }
@@ -45,8 +48,10 @@ public class HelloController {
 
         Request request = new Request(interfaceName, method, parameterTypesString, parameter);
         byte[] bytes = (byte[]) client.invoke(request);
-
-        // 简单的负载均衡，随机取一个
+        String s = new String(bytes);
+        System.out.println(s);
+        return Integer.valueOf(s);
+//        // 简单的负载均衡，随机取一个
 //        Endpoint endpoint = LoadBalance.getEndpoint();
 //        endpoint.request();
 //        String url =  "http://" + endpoint.getHost() + ":" + endpoint.getPort();
@@ -66,8 +71,8 @@ public class HelloController {
 //        try (Response response = httpClient.newCall(request).execute()) {
 //            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 //            byte[] bytes = response.body().bytes();
-            String s = new String(bytes);
-            return Integer.valueOf(s);
+//            String s = new String(bytes);
+//            return Integer.valueOf(s);
 //        } finally {
 //            endpoint.response();
 //        }

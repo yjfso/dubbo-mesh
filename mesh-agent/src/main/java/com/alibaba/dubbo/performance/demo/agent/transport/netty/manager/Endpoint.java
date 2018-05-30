@@ -5,13 +5,19 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 public class Endpoint {
     private final String host;
     private final int port;
     private final AtomicInteger requestNum = new AtomicInteger(0);
-    private int request = 0;
+
+    private volatile int nowRequestNum = 0;
+    private Channel channel;
+    private List<Channel> channelList = new ArrayList<>();
 
     private Object lock = new Object();
     private Bootstrap bootstrap;
@@ -24,17 +30,16 @@ public class Endpoint {
     }
 
     public Endpoint request(){
-        request = requestNum.incrementAndGet();
+        nowRequestNum = requestNum.incrementAndGet();
         return this;
     }
     public Endpoint response(){
-        request = requestNum.decrementAndGet();
+        nowRequestNum = requestNum.decrementAndGet();
         return this;
     }
 
     public Integer getRequestNum(){
-        System.out.println(request);
-        return request;
+        return nowRequestNum;
     }
 
     public String getHost() {

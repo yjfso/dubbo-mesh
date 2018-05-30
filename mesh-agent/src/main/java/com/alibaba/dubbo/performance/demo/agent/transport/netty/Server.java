@@ -16,8 +16,8 @@ public class Server {
 
     public void init() throws Exception{
         ServerBootstrap serverBootstrap = new ServerBootstrap();
-        EventLoopGroup bossGroup = new NioEventLoopGroup(3);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(20);
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         int port = Integer.valueOf(System.getProperty("server.port"));
         ChannelFuture future = serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
