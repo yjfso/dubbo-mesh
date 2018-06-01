@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.performance.demo.agent;
 
-import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentRequest;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +45,13 @@ public class HelloController {
 //    }
 
     public Integer consumer(String interfaceName,String method,String parameterTypesString,String parameter) throws Exception {
-
-        Request request = new Request(interfaceName, method, parameterTypesString, parameter);
-        byte[] bytes = (byte[]) client.invoke(request);
-        String s = new String(bytes);
-        System.out.println(s);
+        AgentRequest agentRequest = new AgentRequest(interfaceName, method, parameterTypesString, parameter);
+        byte[] bytes = (byte[]) client.invoke(agentRequest);
+        String s = new String(bytes, 8, bytes.length-8);
         return Integer.valueOf(s);
 //        // 简单的负载均衡，随机取一个
 //        Endpoint endpoint = LoadBalance.getEndpoint();
-//        endpoint.request();
+//        endpoint.agentRequest();
 //        String url =  "http://" + endpoint.getHost() + ":" + endpoint.getPort();
 //
 //        RequestBody requestBody = new FormBody.Builder()
@@ -63,12 +61,12 @@ public class HelloController {
 //                .add("parameter",parameter)
 //                .build();
 //
-//        Request request = new Request.Builder()
+//        AgentRequest agentRequest = new AgentRequest.Builder()
 //                .url(url)
 //                .post(requestBody)
 //                .build();
 //
-//        try (Response response = httpClient.newCall(request).execute()) {
+//        try (Response response = httpClient.newCall(agentRequest).execute()) {
 //            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 //            byte[] bytes = response.body().bytes();
 //            String s = new String(bytes);

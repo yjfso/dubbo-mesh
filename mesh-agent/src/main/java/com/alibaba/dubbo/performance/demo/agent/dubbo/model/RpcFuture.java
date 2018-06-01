@@ -1,11 +1,13 @@
 package com.alibaba.dubbo.performance.demo.agent.dubbo.model;
 
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentResponse;
+
 import java.util.concurrent.*;
 
 public class RpcFuture implements Future<Object> {
     private CountDownLatch latch = new CountDownLatch(1);
 
-    private RpcResponse response;
+    private AgentResponse response;
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -25,7 +27,7 @@ public class RpcFuture implements Future<Object> {
     @Override
     public Object get() throws InterruptedException {
          //boolean b = latch.await(100, TimeUnit.MICROSECONDS);
-        latch.await(3, TimeUnit.SECONDS);
+        latch.await();//3, TimeUnit.SECONDS);
         try {
             return response.getBytes();
         }catch (Exception e){
@@ -40,7 +42,7 @@ public class RpcFuture implements Future<Object> {
         return response.getBytes();
     }
 
-    public void done(RpcResponse response){
+    public void done(AgentResponse response){
         this.response = response;
         latch.countDown();
     }

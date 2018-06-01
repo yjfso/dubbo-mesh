@@ -12,7 +12,6 @@ public class AgentApp {
     static IRegistry etcdRegistry = EtcdRegistry.registry;
 
     public static void main(String[] args) throws Exception{
-        System.out.println(etcdRegistry);
         String type = System.getProperty("type");   // 获取type参数
         if ("provider".equals(type)){
             (new Server()).init();

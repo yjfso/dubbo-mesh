@@ -4,7 +4,7 @@ import com.alibaba.dubbo.performance.demo.agent.dubbo.model.*;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.*;
-import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentRequest;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ConnectManager;
 
@@ -24,15 +24,15 @@ public class Client {
         );
     }
 
-    public Object invoke(Request request) throws Exception {
+    public Object invoke(AgentRequest agentRequest) throws Exception {
         Endpoint endpoint = connectManager.getEndpoint();
 
-
         RpcFuture future = new RpcFuture();
-        RequestHolder.put(String.valueOf(request.getId()),future);
+        AgentRequestHolder.put(agentRequest.getId(), future);
 
         endpoint.request();
-        endpoint.getChannel().writeAndFlush(request);
+
+        endpoint.getChannel().writeAndFlush(agentRequest);
         Object result = null;
         try {
             result = future.get();

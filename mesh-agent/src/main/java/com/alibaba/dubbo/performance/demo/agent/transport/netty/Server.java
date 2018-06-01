@@ -15,16 +15,22 @@ import java.net.InetSocketAddress;
 public class Server {
 
     public void init() throws Exception{
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        int port = Integer.valueOf(System.getProperty("server.port"));
-        ChannelFuture future = serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ServiceInitializer())
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .bind(new InetSocketAddress(port)).sync();
+        try{
+            int port = Integer.valueOf(System.getProperty("server.port"));
+            ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ServiceInitializer())
+                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.TCP_NODELAY, false)
+                    .bind(new InetSocketAddress(port)).sync();
+            future.channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
 
     }
 }

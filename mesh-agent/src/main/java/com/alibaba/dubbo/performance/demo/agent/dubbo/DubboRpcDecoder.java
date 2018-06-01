@@ -1,7 +1,7 @@
 package com.alibaba.dubbo.performance.demo.agent.dubbo;
 
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.Bytes;
-import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcResponse;
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentResponse;
 import com.alibaba.fastjson.JSON;
 
 import io.netty.buffer.ByteBuf;
@@ -93,8 +93,8 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
         byte[] requestIdBytes = Arrays.copyOfRange(data,4,12);
         long requestId = Bytes.bytes2long(requestIdBytes,0);
 
-        RpcResponse response = new RpcResponse();
-        response.setRequestId(String.valueOf(requestId));
+        AgentResponse response = new AgentResponse();
+        response.setRequestId(requestId);
         response.setBytes(subArray);
         return response;
     }

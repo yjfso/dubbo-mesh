@@ -1,12 +1,10 @@
 package com.alibaba.dubbo.performance.demo.agent.transport.netty;
 
 import com.alibaba.dubbo.performance.demo.agent.dubbo.RpcClient;
-import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcResponse;
-import com.alibaba.dubbo.performance.demo.agent.transport.model.Request;
-import io.netty.buffer.ByteBuf;
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentRequest;
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -18,13 +16,13 @@ public class ServiceHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        Request request = (Request) msg;
-
+        byte[] bytes = (byte[]) msg;
+        AgentRequest request = new AgentRequest().fromBytes(bytes);
         Object result = rpcClient.invoke(request.getInterfaceName(),
                 request.getMethod(), request.getParameterTypesString() ,request.getParameter());
 
-        RpcResponse response = new RpcResponse();
-        response.setRequestId(String.valueOf(request.getId()));
+        AgentResponse response = new AgentResponse();
+        response.setRequestId(request.getId());
         response.setBytes((byte[]) result);
         ctx.writeAndFlush(response);
     }

@@ -16,8 +16,7 @@ public class Endpoint {
     private final AtomicInteger requestNum = new AtomicInteger(0);
 
     private volatile int nowRequestNum = 0;
-    private Channel channel;
-    private List<Channel> channelList = new ArrayList<>();
+    private volatile Channel channel;
 
     private Object lock = new Object();
     private Bootstrap bootstrap;
@@ -74,10 +73,19 @@ public class Endpoint {
         this.bootstrap = bootstrap;
     }
     public Channel getChannel() throws Exception{
+//        if (channel == null){
+//            synchronized (lock){
+//                if (channel == null){
+//                    channel = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
+//                            .sync()
+//                            .channel();
+//                }
+//            }
+//        }
         if (!iterator.hasNext()){
             synchronized (lock){
                 if (!iterator.hasNext()){
-                    for (Integer i=0; i<50; i++){
+                    for (Integer i=0; i<5; i++){
                         channelRing.put(
                                 bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
                                         .sync()

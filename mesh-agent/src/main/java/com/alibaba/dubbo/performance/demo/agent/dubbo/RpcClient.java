@@ -4,8 +4,8 @@ import com.alibaba.dubbo.performance.demo.agent.dubbo.model.JsonUtils;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.Request;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcFuture;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcInvocation;
-import com.alibaba.dubbo.performance.demo.agent.dubbo.model.RpcRequestHolder;
 
+import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ConnectManager;
@@ -53,7 +53,7 @@ public class RpcClient {
         logger.info("requestId=" + request.getId());
 
         RpcFuture future = new RpcFuture();
-        RpcRequestHolder.put(String.valueOf(request.getId()),future);
+        AgentRequestHolder.put(request.getId(),future);
 
         channel.writeAndFlush(request);
 
