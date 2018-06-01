@@ -9,6 +9,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
+    private Client client;
+
+    public ClientHandler(Client client){
+        this.client = client;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
@@ -20,6 +25,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             AgentRequestHolder.remove(id);
             future.done(agentResponse);
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        client.getConnectManager().removeChannel(ctx.channel());
     }
 
     @Override

@@ -19,7 +19,7 @@ public class Endpoint {
     private volatile Channel channel;
 
     private Object lock = new Object();
-    private Bootstrap bootstrap;
+    private ConnectManager connectManager;
     private ChannelRing channelRing = new ChannelRing();
     private Iterator<Channel> iterator = channelRing.iterator();
 
@@ -69,25 +69,32 @@ public class Endpoint {
         return host.hashCode() + port;
     }
 
-    public void setBootstrap(Bootstrap bootstrap){
-        this.bootstrap = bootstrap;
+    public void setConnectManager(ConnectManager connectManager) {
+        this.connectManager = connectManager;
     }
+
+    public void removeChannel(){
+        channel = null;
+    }
+
     public Channel getChannel() throws Exception{
 //        if (channel == null){
 //            synchronized (lock){
 //                if (channel == null){
-//                    channel = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
+//                    channel = connectManager.getBootstrap().connect(new InetSocketAddress(this.getHost(), this.getPort()))
 //                            .sync()
 //                            .channel();
+//                    connectManager.registerChannel(channel, this);
 //                }
 //            }
 //        }
+//        return channel;
         if (!iterator.hasNext()){
             synchronized (lock){
                 if (!iterator.hasNext()){
                     for (Integer i=0; i<5; i++){
                         channelRing.put(
-                                bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()))
+                                connectManager.getBootstrap().connect(new InetSocketAddress(this.getHost(), this.getPort()))
                                         .sync()
                                         .channel()
                         );

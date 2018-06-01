@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.demo.agent;
 
+import com.alibaba.dubbo.performance.demo.agent.dubbo.model.Bytes;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.AgentRequest;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.Client;
 import org.slf4j.Logger;

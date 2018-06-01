@@ -37,5 +37,8 @@ public abstract class AbstractConnectManager implements ConnectManager {
 
     abstract void initBootstrap();
 
-
+    @Override
+    public Bootstrap getBootstrap() {
+        return bootstrap;
+    }
 }

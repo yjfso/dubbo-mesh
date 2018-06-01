@@ -3,6 +3,7 @@ package com.alibaba.dubbo.performance.demo.agent.transport.netty.manager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -11,11 +12,14 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientConnectManager extends AbstractConnectManager {
 
     private EventLoopGroup eventLoopGroup;
     private ChannelHandler handler;
+    private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
 
     public ClientConnectManager(ChannelHandler handler){
         eventLoopGroup = new NioEventLoopGroup();
@@ -35,7 +39,7 @@ public class ClientConnectManager extends AbstractConnectManager {
 
     public ConnectManager setEndPoints(List<Endpoint> endpoints){
         endpoints.forEach(
-                item -> item.setBootstrap(bootstrap)
+                item -> item.setConnectManager(this)
         );
         this.endpoints = endpoints;
         this.i = this.endpoints.size();
@@ -43,12 +47,25 @@ public class ClientConnectManager extends AbstractConnectManager {
     }
 
     public ConnectManager addEndpoint(Endpoint endpoint){
-        endpoint.setBootstrap(bootstrap);
+        endpoint.setConnectManager(this);
         if (this.endpoints == null){
             this.endpoints = new ArrayList<>();
         }
         this.endpoints.add(endpoint);
         this.i = this.endpoints.size();
         return this;
+    }
+
+    public void registerChannel(Channel channel, Endpoint endpoint){
+        channelEndpointMap.put(channel, endpoint);
+    }
+
+    @Override
+    public void removeChannel(Channel channel) {
+        Endpoint endpoint = channelEndpointMap.get(channel);
+        if (endpoint!=null){
+            endpoint.removeChannel();
+            channelEndpointMap.remove(channel);
+        }
     }
 }

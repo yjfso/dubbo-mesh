@@ -35,7 +35,7 @@ public class AgentResponse implements AgentSerializable {
     @Override
     public AgentResponse fromBytes(byte[] bytes) {
         byte[] idBytes = new byte[8];
-        System.arraycopy(bytes, 0, idBytes , 0,8);
+        System.arraycopy(bytes, 0, idBytes , 0, 8);
         this.requestId = Bytes.bytes2long(idBytes);
         this.bytes = bytes;
         return this;

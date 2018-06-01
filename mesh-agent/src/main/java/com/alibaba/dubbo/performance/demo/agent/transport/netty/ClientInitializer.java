@@ -7,6 +7,13 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 
 public class ClientInitializer extends ChannelInitializer<SocketChannel> {
+
+    private Client client;
+
+    public ClientInitializer(Client client){
+        this.client = client;
+    }
+
     @Override
     protected void initChannel(SocketChannel socketChannel) {
         ChannelPipeline pipeline = socketChannel.pipeline();
@@ -19,6 +26,6 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
 
         pipeline.addLast("decoder", new AgentDecoder());
         pipeline.addLast("encoder", new AgentEncoder());
-        pipeline.addLast(new ClientHandler());
+        pipeline.addLast(new ClientHandler(client));
     }
 }

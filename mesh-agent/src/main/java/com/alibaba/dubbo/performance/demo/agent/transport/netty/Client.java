@@ -18,7 +18,7 @@ public class Client {
 
     public Client() throws Exception {
         this.connectManager = new ClientConnectManager(
-                new ClientInitializer()
+                new ClientInitializer(this)
         ).setEndPoints(
                 EtcdRegistry.registry.find("com.alibaba.dubbo.performance.demo.provider.IHelloService")
         );
@@ -41,5 +41,9 @@ public class Client {
             e.printStackTrace();
         }
         return result;
+    }
+
+    ConnectManager getConnectManager() {
+        return connectManager;
     }
 }
