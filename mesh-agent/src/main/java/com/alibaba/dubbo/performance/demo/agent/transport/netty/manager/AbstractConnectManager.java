@@ -5,12 +5,15 @@ import io.netty.channel.Channel;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public abstract class AbstractConnectManager implements ConnectManager {
 
     Bootstrap bootstrap;
 
     List<Endpoint> endpoints;
+    int i;
+    Random random = new Random();
 
     public Endpoint getEndpoint() throws Exception {
 //        return endpoints.get(0);
@@ -18,16 +21,18 @@ public abstract class AbstractConnectManager implements ConnectManager {
 //            throw new Exception("lack of endpoint");
 //        }
 //
-        Integer minNum = 9999;
-        Endpoint endpoint = null;
-        for (Endpoint item : endpoints) {
-            int requestNum = item.getRequestNum();
-            if( requestNum < minNum){
-                minNum = requestNum;
-                endpoint = item;
-            }
-        }
-        return endpoint;
+        int index = i == 0 ? 0 : random.nextInt(i);
+        return endpoints.get(index);
+//        Integer minNum = 9999;
+//        Endpoint endpoint = null;
+//        for (Endpoint item : endpoints) {
+//            int requestNum = item.getRequestNum();
+//            if( requestNum < minNum){
+//                minNum = requestNum;
+//                endpoint = item;
+//            }
+//        }
+//        return endpoint;
     }
 
     abstract void initBootstrap();

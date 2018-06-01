@@ -30,13 +30,13 @@ public class Client {
         RpcFuture future = new RpcFuture();
         AgentRequestHolder.put(agentRequest.getId(), future);
 
-        endpoint.request();
+//        endpoint.request();
 
         endpoint.getChannel().writeAndFlush(agentRequest);
         Object result = null;
         try {
             result = future.get();
-            endpoint.response();
+//            endpoint.response();
         }catch (Exception e){
             e.printStackTrace();
         }
