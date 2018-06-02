@@ -3,15 +3,15 @@ package com.alibaba.dubbo.performance.demo.agent.transport.netty.manager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractConnectManager implements ConnectManager {
 
     Bootstrap bootstrap;
 
-    List<Endpoint> endpoints;
+    List<Endpoint> endpoints = new ArrayList<>();
+
     int i;
     Random random = new Random();
 

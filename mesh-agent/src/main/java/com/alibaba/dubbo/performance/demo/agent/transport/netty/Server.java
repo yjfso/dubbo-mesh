@@ -1,5 +1,7 @@
 package com.alibaba.dubbo.performance.demo.agent.transport.netty;
 
+import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
+import com.alibaba.dubbo.performance.demo.agent.registry.IRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -14,7 +16,14 @@ import java.net.InetSocketAddress;
  */
 public class Server {
 
-    public void init() throws Exception{
+    private static Server server;
+
+    public static void init() throws Exception{
+        server = new Server();
+    }
+
+    private Server() throws Exception{
+        registerServer();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try{
@@ -31,6 +40,15 @@ public class Server {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
 
+    private void registerServer(){
+        IRegistry etcdRegistry = new EtcdRegistry(System.getProperty("etcd.url"));
+        try {
+            int port = Integer.valueOf(System.getProperty("server.port"));
+            etcdRegistry.register("com.alibaba.dubbo.performance.demo.provider.IHelloService",port);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

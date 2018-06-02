@@ -4,10 +4,14 @@ import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint
 import com.coreos.jetcd.Client;
 import com.coreos.jetcd.KV;
 import com.coreos.jetcd.Lease;
+import com.coreos.jetcd.Watch;
 import com.coreos.jetcd.data.ByteSequence;
+import com.coreos.jetcd.data.KeyValue;
 import com.coreos.jetcd.kv.GetResponse;
 import com.coreos.jetcd.options.GetOption;
 import com.coreos.jetcd.options.PutOption;
+import com.coreos.jetcd.watch.WatchEvent;
+import com.coreos.jetcd.watch.WatchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,35 +26,25 @@ public class EtcdRegistry implements IRegistry{
     // 添加watch，在本地内存缓存地址列表，可减少网络调用的次数
     // 使用的是简单的随机负载均衡，如果provider性能不一致，随机策略会影响性能
 
-    public final static IRegistry registry = new EtcdRegistry(System.getProperty("etcd.url"));
     private final String rootPath = "dubbomesh";
     private Lease lease;
     private KV kv;
+    private Watch watch;
     private long leaseId;
 
 
-    private EtcdRegistry(String registryAddress) {
+    public EtcdRegistry(String registryAddress) {
         Client client = Client.builder().endpoints(registryAddress).build();
         this.lease   = client.getLeaseClient();
         this.kv      = client.getKVClient();
+        this.watch   = client.getWatchClient();
+
         try {
             this.leaseId = lease.grant(30).get().getID();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         keepAlive();
-
-        String type = System.getProperty("type");   // 获取type参数
-        if ("provider".equals(type)){
-            // 如果是provider，去etcd注册服务
-            try {
-                int port = Integer.valueOf(System.getProperty("server.port"));
-                register("com.alibaba.dubbo.performance.demo.provider.IHelloService",port);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     // 向ETCD中注册服务
@@ -64,7 +58,7 @@ public class EtcdRegistry implements IRegistry{
     }
 
     // 发送心跳到ETCD,表明该host是活着的
-    public void keepAlive(){
+    private void keepAlive(){
         Executors.newSingleThreadExecutor().submit(
                 () -> {
                     try {
@@ -76,22 +70,48 @@ public class EtcdRegistry implements IRegistry{
         );
     }
 
+    public void watch(String serviceName   ) throws Exception{
+        Executors.newSingleThreadExecutor().submit(
+                () -> {
+                    String strKey = MessageFormat.format("/{0}/{1}",rootPath,serviceName);
+                    ByteSequence key  = ByteSequence.fromString(strKey);
+                    while (true) {
+                        for (WatchEvent event : this.watch.watch(key).listen().getEvents()) {
+                            KeyValue kv = event.getKeyValue();
+                            String s = kv.getKey().toStringUtf8();
+                            int index = s.lastIndexOf("/");
+                            String endpointStr = s.substring(index + 1,s.length());
+
+                            String host = endpointStr.split(":")[0];
+                            int port = Integer.valueOf(endpointStr.split(":")[1]);
+                            switch (event.getEventType()){
+                                case PUT:
+
+                            }
+                            new Endpoint(host,port);
+                        }
+                    }
+                }
+        );
+    }
+
     public List<Endpoint> find(String serviceName) throws Exception {
 
         String strKey = MessageFormat.format("/{0}/{1}",rootPath,serviceName);
         ByteSequence key  = ByteSequence.fromString(strKey);
         GetResponse response = kv.get(key, GetOption.newBuilder().withPrefix(key).build()).get();
+        WatchResponse watchResponse = this.watch.watch(key).listen();
+        watchResponse.getEvents();
 
         List<Endpoint> endpoints = new ArrayList<>();
 
-        for (com.coreos.jetcd.data.KeyValue kv : response.getKvs()){
+        for (KeyValue kv : response.getKvs()){
             String s = kv.getKey().toStringUtf8();
             int index = s.lastIndexOf("/");
             String endpointStr = s.substring(index + 1,s.length());
 
             String host = endpointStr.split(":")[0];
             int port = Integer.valueOf(endpointStr.split(":")[1]);
-            System.out.println("service:" + host + ":" + port);
 
             endpoints.add(new Endpoint(host,port));
         }

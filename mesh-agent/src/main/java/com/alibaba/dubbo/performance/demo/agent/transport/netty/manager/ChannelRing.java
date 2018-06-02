@@ -6,7 +6,8 @@ import java.util.Iterator;
 
 public class ChannelRing implements Iterable<Channel> {
 
-    transient Node now;
+    private final Object lock = new Object();
+    private transient Node now;
 
     class Node{
         Channel channel;
@@ -18,13 +19,33 @@ public class ChannelRing implements Iterable<Channel> {
     }
 
     void put(Channel channel){
-        Node newNode = new Node(channel);
-        if (now == null){
-            now = newNode;
-            now.next = newNode;
-        } else{
-            newNode.next = now.next;
-            now.next = newNode;
+        synchronized(lock){
+            Node newNode = new Node(channel);
+            if (now == null){
+                now = newNode;
+                now.next = newNode;
+            } else{
+                newNode.next = now.next;
+                now.next = newNode;
+            }
+        }
+    }
+
+    void remove(Channel channel){
+        synchronized(lock){
+            Node start = now;
+            Node check = now;
+            while(true){
+                if(check.next.channel == channel){
+                    check.next = check.next.next;
+                    return;
+                } else {
+                    check = check.next;
+                    if(start == check){
+                        return;
+                    }
+                }
+            }
         }
     }
 

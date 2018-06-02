@@ -37,22 +37,20 @@ public class ClientConnectManager extends AbstractConnectManager {
                 .handler(handler);
     }
 
-    public ConnectManager setEndPoints(List<Endpoint> endpoints){
-        endpoints.forEach(
-                item -> item.setConnectManager(this)
-        );
-        this.endpoints = endpoints;
-        this.i = this.endpoints.size();
+    public ConnectManager removeEndpoint(Endpoint endpoint){
+        synchronized (this){
+            this.endpoints.remove(endpoint);
+            this.i = this.endpoints.size();
+        }
         return this;
     }
 
     public ConnectManager addEndpoint(Endpoint endpoint){
-        endpoint.setConnectManager(this);
-        if (this.endpoints == null){
-            this.endpoints = new ArrayList<>();
+        synchronized (this){
+            endpoint.initChannelManager(this);
+            this.endpoints.add(endpoint);
+            this.i = this.endpoints.size();
         }
-        this.endpoints.add(endpoint);
-        this.i = this.endpoints.size();
         return this;
     }
 
@@ -64,7 +62,7 @@ public class ClientConnectManager extends AbstractConnectManager {
     public void removeChannel(Channel channel) {
         Endpoint endpoint = channelEndpointMap.get(channel);
         if (endpoint!=null){
-            endpoint.removeChannel();
+            endpoint.getChannelManager().removeChannel(channel);
             channelEndpointMap.remove(channel);
         }
     }

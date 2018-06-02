@@ -14,18 +14,23 @@ public class Endpoint {
     private final String host;
     private final int port;
     private final AtomicInteger requestNum = new AtomicInteger(0);
+    private ChannelManager channelManager;
 
     private volatile int nowRequestNum = 0;
-    private volatile Channel channel;
-
-    private Object lock = new Object();
-    private ConnectManager connectManager;
-    private ChannelRing channelRing = new ChannelRing();
-    private Iterator<Channel> iterator = channelRing.iterator();
 
     public Endpoint(String host,int port){
         this.host = host;
         this.port = port;
+    }
+
+    public void initChannelManager(ConnectManager connectManager){
+        if (channelManager == null){
+           this.channelManager = new ChannelManager(connectManager, this);
+        }
+    }
+
+    public ChannelManager getChannelManager(){
+        return this.channelManager;
     }
 
     public Endpoint request(){
@@ -67,42 +72,6 @@ public class Endpoint {
 
     public int hashCode(){
         return host.hashCode() + port;
-    }
-
-    public void setConnectManager(ConnectManager connectManager) {
-        this.connectManager = connectManager;
-    }
-
-    public void removeChannel(){
-        channel = null;
-    }
-
-    public Channel getChannel() throws Exception{
-//        if (channel == null){
-//            synchronized (lock){
-//                if (channel == null){
-//                    channel = connectManager.getBootstrap().connect(new InetSocketAddress(this.getHost(), this.getPort()))
-//                            .sync()
-//                            .channel();
-//                    connectManager.registerChannel(channel, this);
-//                }
-//            }
-//        }
-//        return channel;
-        if (!iterator.hasNext()){
-            synchronized (lock){
-                if (!iterator.hasNext()){
-                    for (Integer i=0; i<5; i++){
-                        channelRing.put(
-                                connectManager.getBootstrap().connect(new InetSocketAddress(this.getHost(), this.getPort()))
-                                        .sync()
-                                        .channel()
-                        );
-                    }
-                }
-            }
-        }
-        return iterator.next();
     }
 
 }
