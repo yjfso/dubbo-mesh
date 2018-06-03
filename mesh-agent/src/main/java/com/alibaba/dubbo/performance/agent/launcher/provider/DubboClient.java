@@ -60,6 +60,7 @@ public class DubboClient {
         Object result = null;
         try {
             result = future.get();
+            AgentRequestHolder.remove(request.getId());
         }catch (Exception e){
             e.printStackTrace();
         }

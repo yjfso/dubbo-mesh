@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
  */
 public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
-    private DubboClient rpcClient = new DubboClient();
-    private int i = 0;
 
     ExecutorService fixedThreadPool = Executors.newFixedThreadPool(20);
 
@@ -25,7 +23,7 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         fixedThreadPool.submit(()->{
             try{
                 AgentRequest request = new AgentRequest().fromBytes(bytes);
-                Object result = rpcClient.invoke(request.getInterfaceName(),
+                Object result = Provider.dubboClient.invoke(request.getInterfaceName(),
                         request.getMethod(), request.getParameterTypesString() ,request.getParameter());
 
                 AgentResponse response = new AgentResponse();

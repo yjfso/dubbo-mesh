@@ -25,10 +25,10 @@ public class Provider {
     static DubboClient dubboClient;
 
     private Provider() throws Exception{
+        dubboClient = new DubboClient();
         registerServer();
         startWorkThread();
         startServer();
-        dubboClient = new DubboClient();
     }
 
     private void startServer() throws Exception{

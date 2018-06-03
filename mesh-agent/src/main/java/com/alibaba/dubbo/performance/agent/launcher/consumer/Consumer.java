@@ -49,15 +49,20 @@ public class Consumer {
 
         Endpoint endpoint = connectManager.getEndpoint();
 
+
+        Channel channel = endpoint.getChannelManager().getChannel();
+        if (channel == null){
+            return null;
+        }
+        channel.writeAndFlush(agentRequest);
+
         RpcFuture future = new RpcFuture();
         AgentRequestHolder.put(agentRequest.getId(), future);
-
         endpoint.request();
-
-        endpoint.getChannelManager().getChannel().writeAndFlush(agentRequest);
         Object result = null;
         try {
             result = future.get();
+            AgentRequestHolder.remove(agentRequest.getId());
             endpoint.response();
         }catch (Exception e){
             e.printStackTrace();

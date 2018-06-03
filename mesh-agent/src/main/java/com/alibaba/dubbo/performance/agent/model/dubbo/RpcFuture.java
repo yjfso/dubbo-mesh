@@ -1,13 +1,17 @@
 package com.alibaba.dubbo.performance.agent.model.dubbo;
 
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
 public class RpcFuture implements Future<Object> {
+
+    private static final Logger log = LoggerFactory.getLogger(RpcFuture.class);
     private CountDownLatch latch = new CountDownLatch(1);
 
-    private final static byte[] ERROR = "0".getBytes();
+    private final static byte[] ERROR = "000000000".getBytes();
 
     private AgentResponse response;
 
@@ -33,7 +37,7 @@ public class RpcFuture implements Future<Object> {
         try {
             return response.getBytes();
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("get response timeout");
         }
         return ERROR;
     }

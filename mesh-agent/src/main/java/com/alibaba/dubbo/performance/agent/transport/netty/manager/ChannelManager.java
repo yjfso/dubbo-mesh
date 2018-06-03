@@ -18,11 +18,13 @@ public class ChannelManager {
     ChannelManager(ConnectManager connectManager, Endpoint endpoint){
         this.connectManager = connectManager;
         this.endpoint = endpoint;
+        addChannels(endpoint.channelNum);
     }
 
     void replaceChannel(Channel channel){
+        System.out.println("remove a channel: " + endpoint);
         channelRing.remove(channel);
-        addNewChannel();
+//        addNewChannel();
     }
 
     private void addNewChannel(){
@@ -32,6 +34,7 @@ public class ChannelManager {
                     .channel();
             channelRing.put(channel);
             connectManager.registerChannel(channel, endpoint);
+            System.out.println("add a new channel: " + endpoint);
         } catch (Exception e){
             logger.error("new Channel error", e);
         }
@@ -45,13 +48,9 @@ public class ChannelManager {
     }
 
     public Channel getChannel() throws Exception{
-        if (!iterator.hasNext()){
-            synchronized (lock){
-                if (!iterator.hasNext()){
-                    addChannels(endpoint.channelNum);
-                }
-            }
+        if(iterator.hasNext()){
+            return iterator.next();
         }
-        return iterator.next();
+        return null;
     }
 }

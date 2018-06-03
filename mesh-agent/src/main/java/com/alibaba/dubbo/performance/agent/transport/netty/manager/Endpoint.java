@@ -71,6 +71,7 @@ public class Endpoint {
 
     public Endpoint setWeight(int weight) {
         this.weight = weight;
+        this.channelNum = 3 * weight;
         return this;
     }
 }

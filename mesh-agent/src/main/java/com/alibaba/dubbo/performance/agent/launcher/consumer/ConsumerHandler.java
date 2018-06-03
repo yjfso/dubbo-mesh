@@ -21,7 +21,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
         long id = agentResponse.getRequestId();
         RpcFuture future = AgentRequestHolder.get(id);
         if(null != future){
-            AgentRequestHolder.remove(id);
             future.done(agentResponse);
         }
     }

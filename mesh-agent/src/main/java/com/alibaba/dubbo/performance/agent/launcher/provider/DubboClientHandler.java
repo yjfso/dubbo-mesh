@@ -14,7 +14,6 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<AgentRespons
         long requestId = response.getRequestId();
         RpcFuture future = AgentRequestHolder.get(requestId);
         if(null != future){
-            AgentRequestHolder.remove(requestId);
             future.done(response);
         }
     }

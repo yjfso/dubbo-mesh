@@ -9,7 +9,7 @@ public class ChannelRing implements Iterable<Channel> {
     private final Object lock = new Object();
     private transient Node now;
 
-    class Node{
+    private class Node{
         Channel channel;
         Node next;
 
@@ -33,16 +33,21 @@ public class ChannelRing implements Iterable<Channel> {
 
     void remove(Channel channel){
         synchronized(lock){
-            Node start = now;
-            Node check = now;
-            while(true){
-                if(check.next.channel == channel){
-                    check.next = check.next.next;
-                    return;
-                } else {
-                    check = check.next;
-                    if(start == check){
+            if (now == now.next && now.channel == channel){
+                now = null;
+            } else {
+                Node start = now;
+                Node check = now;
+                while(true){
+                    if(check.next.channel == channel){
+                        check.next = check.next.next;
+                        now = check.next;
                         return;
+                    } else {
+                        check = check.next;
+                        if(start == check){
+                            return;
+                        }
                     }
                 }
             }
