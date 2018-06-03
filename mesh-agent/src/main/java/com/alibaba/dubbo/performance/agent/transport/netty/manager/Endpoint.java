@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Endpoint {
     private final String host;
     private final int port;
+    final AtomicInteger allRequestNum = new AtomicInteger(0);
     private final AtomicInteger requestNum = new AtomicInteger(0);
     private ChannelManager channelManager;
     int channelNum = 3;
@@ -29,6 +30,7 @@ public class Endpoint {
     }
 
     public Endpoint request(){
+        allRequestNum.incrementAndGet();
         nowRequestNum = requestNum.incrementAndGet();
         return this;
     }
@@ -54,7 +56,7 @@ public class Endpoint {
     }
 
     public String toString(){
-        return host + ":" + port;
+        return host + ":" + port + "|" + allRequestNum + "|" + nowRequestNum;
     }
 
     public boolean equals(Object o){
@@ -71,7 +73,7 @@ public class Endpoint {
 
     public Endpoint setWeight(int weight) {
         this.weight = weight;
-        this.channelNum = 3 * weight;
+        this.channelNum = 3;
         return this;
     }
 }

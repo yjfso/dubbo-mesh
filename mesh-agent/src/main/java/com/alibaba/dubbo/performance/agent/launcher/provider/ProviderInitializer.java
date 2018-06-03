@@ -14,13 +14,19 @@ import io.netty.channel.socket.SocketChannel;
  */
 public class ProviderInitializer extends ChannelInitializer<SocketChannel> {
 
+    private Provider provider;
+
+    ProviderInitializer(Provider provider){
+        this.provider = provider;
+    }
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new AgentDecoder());
         pipeline.addLast("encoder", new AgentEncoder());
-        pipeline.addLast(new ProviderHandler());
+        pipeline.addLast(new ProviderHandler(provider));
 
     }
 }

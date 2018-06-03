@@ -9,6 +9,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 public class DubboClientHandler extends SimpleChannelInboundHandler<AgentResponse> {
 
+
+    private DubboClient dubboClient;
+
+    public DubboClientHandler(DubboClient dubboClient){
+        this.dubboClient = dubboClient;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, AgentResponse response) {
         long requestId = response.getRequestId();
@@ -16,6 +23,11 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<AgentRespons
         if(null != future){
             future.done(response);
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        dubboClient.connectManager.removeChannel(ctx.channel());
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.alibaba.dubbo.performance.agent.transport.netty.manager;
 import io.netty.bootstrap.Bootstrap;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractConnectManager implements ConnectManager {
 
@@ -29,6 +30,7 @@ public abstract class AbstractConnectManager implements ConnectManager {
                 min = endpoint;
             }
         }
+        System.out.println("route to "+ min + "\n-----------------------------");
         return min;
     }
 

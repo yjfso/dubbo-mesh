@@ -20,12 +20,12 @@ import java.io.PrintWriter;
 public class DubboClient {
     private Logger logger = LoggerFactory.getLogger(DubboClient.class);
 
-    private ConnectManager connectManager;
+    ConnectManager connectManager;
 
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
         this.connectManager = new ClientConnectManager(
-                new DubboClientInitializer()
+                new DubboClientInitializer(this)
         ).addEndpoint(
                 new Endpoint("127.0.0.1", port)
         );

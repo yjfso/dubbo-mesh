@@ -10,6 +10,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -18,17 +20,19 @@ public class Provider {
 
     private static Provider INSTANCE;
 
-    public static void init() throws Exception{
-        INSTANCE = new Provider();
-    }
-    private int workerThreadNum = 10;
     static DubboClient dubboClient;
+    private int weight = 1;
+    ExecutorService providerExecutor;
 
     private Provider() throws Exception{
         dubboClient = new DubboClient();
+        this.weight = Integer.valueOf(System.getProperty("server.weight"));
         registerServer();
         startWorkThread();
         startServer();
+    }
+    public static void init() throws Exception{
+        INSTANCE = new Provider();
     }
 
     private void startServer() throws Exception{
@@ -38,10 +42,10 @@ public class Provider {
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ProviderInitializer())
-                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .childHandler(new ProviderInitializer(this))
+//                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, false)
+//                    .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {
@@ -51,15 +55,14 @@ public class Provider {
     }
 
     private void startWorkThread(){
-        workerThreadNum = Integer.valueOf(System.getProperty("worker.thread.num"));
-
+        int num = 20;// + weight * 2;
+        providerExecutor = Executors.newFixedThreadPool(num);
     }
 
     private void registerServer(){
         IRegistry etcdRegistry = new EtcdRegistry(System.getProperty("etcd.url"));
         try {
             int port = Integer.valueOf(System.getProperty("server.port"));
-            int weight = Integer.valueOf(System.getProperty("server.weight"));
             etcdRegistry.register("com.alibaba.dubbo.performance.demo.provider.IHelloService", port, weight);
         } catch (Exception e) {
             e.printStackTrace();

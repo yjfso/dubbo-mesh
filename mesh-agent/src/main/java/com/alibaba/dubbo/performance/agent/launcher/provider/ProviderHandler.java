@@ -13,14 +13,17 @@ import java.util.concurrent.Executors;
  */
 public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
+    private Provider provider;
 
-    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(20);
+    ProviderHandler(Provider provider){
+        this.provider = provider;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
         byte[] bytes = (byte[]) msg;
-        fixedThreadPool.submit(()->{
+        provider.providerExecutor.submit(()->{
             try{
                 AgentRequest request = new AgentRequest().fromBytes(bytes);
                 Object result = Provider.dubboClient.invoke(request.getInterfaceName(),
