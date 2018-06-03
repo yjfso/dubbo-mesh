@@ -13,6 +13,7 @@ public class AgentApp {
         if ("provider".equals(type)){
             Server.init();
         } else{
+            Client.init();
             SpringApplication.run(AgentApp.class,args);
         }
     }

@@ -22,7 +22,7 @@ public class HelloController {
                          @RequestParam("parameterTypesString") String parameterTypesString,
                          @RequestParam("parameter") String parameter) throws Exception {
         AgentRequest agentRequest = new AgentRequest(interfaceName, method, parameterTypesString, parameter);
-        byte[] bytes = (byte[]) Client.SingletonHolder.INSTANCE.invoke(agentRequest);
+        byte[] bytes = (byte[]) Client.INSTANCE.invoke(agentRequest);
         String s = new String(bytes, 8, bytes.length-8);
         return Integer.valueOf(s);
     }

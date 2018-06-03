@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.demo.agent.registry;
 
+import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.ConnectManager;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.coreos.jetcd.Client;
 import com.coreos.jetcd.KV;
@@ -70,11 +71,12 @@ public class EtcdRegistry implements IRegistry{
         );
     }
 
-    public void watch(String serviceName   ) throws Exception{
+    public void watch(String serviceName, ConnectManager connectManager) throws Exception{
+        this.find(serviceName);
         Executors.newSingleThreadExecutor().submit(
                 () -> {
-                    String strKey = MessageFormat.format("/{0}/{1}",rootPath,serviceName);
-                    ByteSequence key  = ByteSequence.fromString(strKey);
+                    String strKey = MessageFormat.format("/{0}/{1}", rootPath, serviceName);
+                    ByteSequence key  = ByteSequence.fromString("test1");
                     while (true) {
                         for (WatchEvent event : this.watch.watch(key).listen().getEvents()) {
                             KeyValue kv = event.getKeyValue();
@@ -84,11 +86,15 @@ public class EtcdRegistry implements IRegistry{
 
                             String host = endpointStr.split(":")[0];
                             int port = Integer.valueOf(endpointStr.split(":")[1]);
+                            Endpoint endpoint = new Endpoint(host,port);
                             switch (event.getEventType()){
                                 case PUT:
-
+                                    connectManager.addEndpoint(endpoint);
+                                    break;
+                                case DELETE:
+                                    connectManager.removeEndpoint(endpoint);
                             }
-                            new Endpoint(host,port);
+
                         }
                     }
                 }
@@ -96,12 +102,9 @@ public class EtcdRegistry implements IRegistry{
     }
 
     public List<Endpoint> find(String serviceName) throws Exception {
-
         String strKey = MessageFormat.format("/{0}/{1}",rootPath,serviceName);
         ByteSequence key  = ByteSequence.fromString(strKey);
         GetResponse response = kv.get(key, GetOption.newBuilder().withPrefix(key).build()).get();
-        WatchResponse watchResponse = this.watch.watch(key).listen();
-        watchResponse.getEvents();
 
         List<Endpoint> endpoints = new ArrayList<>();
 

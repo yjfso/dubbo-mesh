@@ -2,6 +2,7 @@ package com.alibaba.dubbo.performance.demo.agent.transport.netty;
 
 import com.alibaba.dubbo.performance.demo.agent.dubbo.RpcClient;
 import com.alibaba.dubbo.performance.demo.agent.dubbo.model.*;
+import com.alibaba.dubbo.performance.demo.agent.registry.IRegistry;
 import com.alibaba.dubbo.performance.demo.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.demo.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.demo.agent.transport.model.*;
@@ -19,9 +20,10 @@ public class Client {
 
     private static Logger logger = LoggerFactory.getLogger(RpcClient.class);
     private ConnectManager connectManager;
+    public static Client INSTANCE;
 
-    public static class SingletonHolder {
-        public static final Client INSTANCE = new Client();
+    public static void init(){
+        INSTANCE = new Client();
     }
 
     private Client()  {
@@ -29,6 +31,8 @@ public class Client {
             this.connectManager = new ClientConnectManager(
                     new ClientInitializer(this)
             );
+            new EtcdRegistry(System.getProperty("etcd.url"))
+                    .watch("com.alibaba.dubbo.performance.demo.provider.IHelloService", connectManager);
         } catch (Exception e){
             logger.error("client start error", e);
         }

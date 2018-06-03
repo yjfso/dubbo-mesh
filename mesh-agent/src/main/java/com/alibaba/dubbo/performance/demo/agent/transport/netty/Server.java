@@ -16,10 +16,10 @@ import java.net.InetSocketAddress;
  */
 public class Server {
 
-    private static Server server;
+    private static Server INSTANCE;
 
     public static void init() throws Exception{
-        server = new Server();
+        INSTANCE = new Server();
     }
 
     private Server() throws Exception{

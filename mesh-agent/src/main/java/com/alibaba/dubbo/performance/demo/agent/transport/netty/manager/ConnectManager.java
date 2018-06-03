@@ -13,4 +13,8 @@ public interface ConnectManager {
     void registerChannel(Channel channel, Endpoint endpoint);
 
     void removeChannel(Channel channel);
+
+    ConnectManager addEndpoint(Endpoint endpoint);
+
+    ConnectManager removeEndpoint(Endpoint endpoint);
 }
