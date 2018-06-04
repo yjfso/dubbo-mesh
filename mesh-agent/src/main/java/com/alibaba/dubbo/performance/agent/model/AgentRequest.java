@@ -19,8 +19,9 @@ public class AgentRequest implements AgentSerializable {
     public AgentRequest(){
     }
 
-    public void init(){
+    public AgentRequest initRequest(){
         id = atomicLong.getAndIncrement();
+        return this;
     }
 
     public AgentRequest initData(String interfaceName, String method, String parameterTypesString, String parameter){

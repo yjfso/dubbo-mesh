@@ -30,7 +30,7 @@ public abstract class AbstractConnectManager implements ConnectManager {
                 min = endpoint;
             }
         }
-        System.out.println("route to "+ min + "\n-----------------------------");
+//        System.out.println("route to "+ min + "\n-----------------------------");
         return min;
     }
 

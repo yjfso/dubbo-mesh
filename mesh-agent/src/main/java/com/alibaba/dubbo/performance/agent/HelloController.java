@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 @RestController
 public class HelloController {
@@ -22,29 +25,47 @@ public class HelloController {
                          @RequestParam("parameter") String parameter) throws Exception {
 //        AgentRequest agentRequest = new AgentRequest().initData("interfaceName", "method", "parameterTypesString", "parameterTypesString");
 //                agentRequest.init();
-        AgentRequest agentRequest = pool.borrowObject()
+//        AgentPool pool = new AgentPool<AgentRequest>();
+        AgentRequest agentRequest = (new AgentRequest().initRequest())
                 .initData(interfaceName, method, parameterTypesString, parameter);
         try{
+        byte[] bytes = (byte[]) Consumer.INSTANCE.invoke(agentRequest);
+        String s = new String(bytes, 8, bytes.length-8);
+            return Integer.valueOf(s);
         } finally {
-            pool.returnObject(agentRequest);
+//            pool.returnObject(agentRequest);
         }
-//        byte[] bytes = (byte[]) Consumer.INSTANCE.invoke(agentRequest);
-//        String s = new String(bytes, 8, bytes.length-8);
-        return 1;//Integer.valueOf(s);
     }
 
+    static class AgentPool<E>{
+
+        private Queue<E> queue = new ConcurrentLinkedQueue();
+
+        public E borrowObject(){
+            if(queue.isEmpty()){
+                return (E)new AgentRequest();
+            }
+            return queue.poll();
+        }
+
+        public void returnObject(E e){
+            queue.add(e);
+        }
+
+    }
     public static void main(String[] args) throws Exception {
         long s, e;
+        AgentPool pool = new AgentPool<AgentRequest>();
         for(int i=0;i<6;i++){
             s = System.nanoTime();
             for (int j=0;j<1000000;j++){
 //                AgentRequest agentRequest = new AgentRequest().initData("interfaceName", "method", "parameterTypesString", "parameterTypesString");
 //                agentRequest.init();
 
-                AgentRequest agentRequest = pool.borrowObject()
+                AgentRequest agentRequest = ((AgentRequest) pool.borrowObject())
                         .initData1("interfaceName", "method", "parameterTypesString", "parameterTypesString");
                 try{
-                    System.out.println(pool.getNumActive());
+//                    System.out.println(pool.getNumActive());
                 } finally {
                     pool.returnObject(agentRequest);
                 }
