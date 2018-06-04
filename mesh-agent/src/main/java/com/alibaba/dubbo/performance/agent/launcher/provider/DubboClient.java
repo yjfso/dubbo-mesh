@@ -46,7 +46,6 @@ public class DubboClient {
         invocation.setArguments(out.toByteArray());
 
         Request request = new Request();
-        request.setVersion("2.0.0");
         request.setTwoWay(true);
         request.setData(invocation);
 

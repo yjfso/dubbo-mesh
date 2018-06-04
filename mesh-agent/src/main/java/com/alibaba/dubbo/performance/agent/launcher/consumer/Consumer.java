@@ -1,10 +1,7 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
-import com.alibaba.dubbo.performance.agent.util.JsonUtils;
-import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcFuture;
-import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.launcher.provider.DubboClient;

@@ -19,12 +19,24 @@ public class AgentRequest implements AgentSerializable {
     public AgentRequest(){
     }
 
-    public AgentRequest(String interfaceName, String method, String parameterTypesString, String parameter){
+    public void init(){
         id = atomicLong.getAndIncrement();
+    }
+
+    public AgentRequest initData(String interfaceName, String method, String parameterTypesString, String parameter){
         this.interfaceName = interfaceName;
         this.method = method;
         this.parameterTypesString = parameterTypesString;
         this.parameter = parameter;
+        return this;
+    }
+
+    public AgentRequest initData1(String interfaceName, String method, String parameterTypesString, String parameter){
+        if (!interfaceName.equals(this.interfaceName)) this.interfaceName = interfaceName;
+        if (!method.equals(this.method)) this.method = method;
+        if (!parameterTypesString.equals(this.parameterTypesString)) this.parameterTypesString = parameterTypesString;
+        if (!parameter.equals(this.parameter)) this.parameter = parameter;
+        return this;
     }
 
     public long getId() {
