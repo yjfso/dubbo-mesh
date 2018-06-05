@@ -6,6 +6,9 @@ import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentEnco
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 
 
 /**
@@ -13,19 +16,20 @@ import io.netty.channel.socket.SocketChannel;
  */
 public class ConsumerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private Provider provider;
+    private Consumer consumer;
 
-    ConsumerInitializer(Provider provider){
-        this.provider = provider;
+    ConsumerInitializer(Consumer consumer){
+        this.consumer = consumer;
     }
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
 
-        pipeline.addLast("decoder", new AgentDecoder());
-        pipeline.addLast("encoder", new AgentEncoder());
-        pipeline.addLast(new ConsumerHandler(provider));
+        pipeline.addLast("encoder", new HttpResponseEncoder());
+        pipeline.addLast("decoder", new HttpRequestDecoder());
+        pipeline.addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
+        pipeline.addLast(new ConsumerHandler(consumer));
 
     }
 }

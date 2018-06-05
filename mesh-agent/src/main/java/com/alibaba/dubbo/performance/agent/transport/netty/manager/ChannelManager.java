@@ -23,7 +23,7 @@ public class ChannelManager {
     }
 
     void removeChannel(Channel channel){
-        channel = null;
+        this.channel = null;
 //        channelRing.remove(channel);
 //        addNewChannel();
     }
@@ -54,6 +54,7 @@ public class ChannelManager {
                     channel = connectManager.getBootstrap().connect(endpoint.getInetSocketAddress())
                             .sync()
                             .channel();
+                    connectManager.registerChannel(channel, endpoint);
                 }
             }
         }

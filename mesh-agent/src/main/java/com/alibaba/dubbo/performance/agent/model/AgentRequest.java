@@ -64,6 +64,10 @@ public class AgentRequest implements AgentSerializable {
         return parameter;
     }
 
+    public boolean isValid(){
+        return parameter!=null && parameterTypesString!=null && interfaceName!=null && method!=null;
+    }
+
     @Override
     public byte[] toBytes() {
         byte[] data = Bytes.mergeByteWithLength(

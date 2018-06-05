@@ -1,9 +1,5 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
-import com.alibaba.dubbo.performance.agent.launcher.provider.DubboClient;
-import com.alibaba.dubbo.performance.agent.launcher.provider.ProviderInitializer;
-import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
-import com.alibaba.dubbo.performance.agent.registry.IRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -22,12 +18,10 @@ public class Consumer {
 
     private static Consumer INSTANCE;
 
-    static AgentClient agentClient;
-    ExecutorService providerExecutor;
+    ExecutorService executorService;
 
     private Consumer() throws Exception{
-        agentClient = new AgentClient();
-        registerServer();
+        AgentClient.init();
         startWorkThread();
         startServer();
     }
@@ -43,7 +37,7 @@ public class Consumer {
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ConsumerHandler(this))
+                    .childHandler(new ConsumerInitializer(this))
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
@@ -54,17 +48,8 @@ public class Consumer {
     }
 
     private void startWorkThread(){
-        int num = 110;// + weight * 2;
-        providerExecutor = Executors.newFixedThreadPool(num);
+        int num = 120;// + weight * 2;
+        executorService = Executors.newFixedThreadPool(num);
     }
 
-    private void registerServer(){
-        IRegistry etcdRegistry = new EtcdRegistry(System.getProperty("etcd.url"));
-        try {
-            int port = Integer.valueOf(System.getProperty("server.port"));
-            etcdRegistry.register("com.alibaba.dubbo.performance.demo.provider.IHelloService", port, weight);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
