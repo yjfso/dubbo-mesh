@@ -1,11 +1,9 @@
 package com.alibaba.dubbo.performance.agent;
 
-import com.alibaba.dubbo.performance.agent.launcher.consumer.Consumer;
+import com.alibaba.dubbo.performance.agent.launcher.consumer.AgentClient;
 import com.alibaba.dubbo.performance.agent.launcher.provider.Provider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.stream.IntStream;
 
 @SpringBootApplication
 public class AgentApp {
@@ -15,7 +13,7 @@ public class AgentApp {
         if ("provider".equals(type)){
             Provider.init();
         } else{
-            Consumer.init();
+            AgentClient.init();
             SpringApplication.run(AgentApp.class,args);
         }
     }

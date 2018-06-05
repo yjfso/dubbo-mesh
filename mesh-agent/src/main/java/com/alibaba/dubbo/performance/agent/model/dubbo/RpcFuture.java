@@ -33,7 +33,7 @@ public class RpcFuture implements Future<Object> {
     @Override
     public Object get() throws InterruptedException {
          //boolean b = latch.await(100, TimeUnit.MICROSECONDS);
-        latch.await();//3, TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
         try {
             return response.getBytes();
         }catch (Exception e){

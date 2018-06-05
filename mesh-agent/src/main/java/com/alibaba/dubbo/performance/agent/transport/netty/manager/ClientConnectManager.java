@@ -8,14 +8,20 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClientConnectManager extends AbstractConnectManager {
+public class ClientConnectManager extends AbstractConnectManager implements ConnectManager {
 
     private EventLoopGroup eventLoopGroup;
     private ChannelHandler handler;
     private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
+
+    private List<Endpoint> endpoints = new ArrayList<>();
+
 
     public ClientConnectManager(ChannelHandler handler){
         eventLoopGroup = new NioEventLoopGroup();
@@ -36,7 +42,6 @@ public class ClientConnectManager extends AbstractConnectManager {
     public ConnectManager removeEndpoint(Endpoint endpoint){
         synchronized (this){
             this.endpoints.remove(endpoint);
-            this.i = this.endpoints.size();
         }
         return this;
     }
@@ -45,7 +50,6 @@ public class ClientConnectManager extends AbstractConnectManager {
         synchronized (this){
             endpoint.initChannelManager(this);
             this.endpoints.add(endpoint);
-            this.i = this.endpoints.size();
         }
         return this;
     }
@@ -54,12 +58,28 @@ public class ClientConnectManager extends AbstractConnectManager {
         channelEndpointMap.put(channel, endpoint);
     }
 
-    @Override
     public void removeChannel(Channel channel) {
         Endpoint endpoint = channelEndpointMap.get(channel);
         if (endpoint!=null){
-            endpoint.getChannelManager().replaceChannel(channel);
+            endpoint.getChannelManager().removeChannel(channel);
             channelEndpointMap.remove(channel);
         }
     }
+
+    public Endpoint getEndpoint() throws Exception {
+        Iterator<Endpoint> iterator = endpoints.iterator();
+        if(!iterator.hasNext()){
+            throw new Exception("lack of endpoint");
+        }
+        Endpoint min = iterator.next();
+        while (iterator.hasNext()){
+            Endpoint endpoint = iterator.next();
+            if (min.nowRequestNum * endpoint.weight > endpoint.nowRequestNum * min.weight){
+                min = endpoint;
+            }
+        }
+        System.out.println("route to "+ min + "\n-----------------------------");
+        return min;
+    }
+
 }

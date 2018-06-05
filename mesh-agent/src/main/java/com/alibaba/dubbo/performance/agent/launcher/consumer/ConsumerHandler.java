@@ -1,33 +1,41 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
-import com.alibaba.dubbo.performance.agent.model.dubbo.RpcFuture;
-import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
+import com.alibaba.dubbo.performance.agent.launcher.provider.Provider;
+import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+/**
+ * Created by yinjianfeng on 18/5/27.
+ */
 public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     private Consumer consumer;
 
-    public ConsumerHandler(Consumer consumer){
+    ConsumerHandler(Consumer consumer){
         this.consumer = consumer;
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        AgentResponse agentResponse = new AgentResponse().fromBytes((byte[]) msg);
-        long id = agentResponse.getRequestId();
-        RpcFuture future = AgentRequestHolder.get(id);
-        if(null != future){
-            future.done(agentResponse);
-        }
-    }
+        byte[] bytes = (byte[]) msg;
+        consumer.providerExecutor.submit(()->{
+            try{
+                AgentRequest request = new AgentRequest().fromBytes(bytes);
+                Object result = Provider.dubboClient.invoke(request.getInterfaceName(),
+                        request.getMethod(), request.getParameterTypesString() ,request.getParameter());
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        consumer.getConnectManager().removeChannel(ctx.channel());
+                AgentResponse response = new AgentResponse();
+                response.setRequestId(request.getId());
+                response.setBytes((byte[]) result);
+                ctx.writeAndFlush(response);
+            } catch (Exception e){
+
+            }
+        });
+
     }
 
     @Override
@@ -37,5 +45,8 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-
+//    @Override
+//    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+//        ctx.flush();
+//    }
 }
