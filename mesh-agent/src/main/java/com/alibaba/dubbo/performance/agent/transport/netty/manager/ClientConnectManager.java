@@ -97,7 +97,6 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
     }
 
     public Endpoint getEndpoint() throws Exception {
-        System.out.println("route to "+ activeEndpoint + "\n-----------------------------");
         return activeEndpoint;
     }
 

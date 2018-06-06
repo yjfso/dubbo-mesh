@@ -34,7 +34,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger log = LoggerFactory.getLogger(ConsumerHandler.class);
-    private final static ByteBuf ERROR_BUF = Unpooled.buffer();
+    private final static ByteBuf ERROR_BUF = Unpooled.wrappedBuffer(new byte[]{1, 2, 8,32,42,2});
 
     private Consumer consumer;
 
@@ -46,53 +46,59 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
         consumer.executorService.submit(()->{
-            if (msg instanceof FullHttpRequest) {
-                FullHttpRequest req = (FullHttpRequest) msg;
-
-                HttpMethod httpMethod = req.method();
-                if (HttpMethod.POST.equals(httpMethod) ) {
-                    try{
-                        boolean keepAlive = HttpUtil.isKeepAlive(req);
-                        HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(req);
-                        decoder.offer(req);
-                        List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
-                        Map<String, String> paramters = new HashMap<>();
-                        for (InterfaceHttpData parm : parmList) {
-                            Attribute data = (Attribute) parm;
-                            paramters.put(data.getName(), data.getValue());
-                        }
-
-                        String interfaceName = paramters.get("interface");
-                        String method = paramters.get("method");
-                        String parameterTypesString = paramters.get("parameterTypesString");
-                        String parameter = paramters.get("parameter");
-                        AgentRequest agentRequest = (new AgentRequest().initRequest())
-                                .initData(interfaceName, method, parameterTypesString, parameter);
-
-                        ByteBuf byteBuf = null;
-                        if (agentRequest.isValid()) {
-                            byte[] bytes = (byte[]) AgentClient.INSTANCE.invoke(agentRequest);
-                            byteBuf = Unpooled.wrappedBuffer(bytes, 8, bytes.length-8);
-                        } else {
-                            byteBuf = ERROR_BUF;
-                        }
-
-                        FullHttpResponse response = new DefaultFullHttpResponse( HTTP_1_1, OK, byteBuf);
-                        response.headers().set(CONTENT_TYPE, "text/plain");
-                        response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
-
-                        if (!keepAlive) {
-                            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-                        } else {
-                            response.headers().set(CONNECTION, CONNECTION);
-                            ctx.writeAndFlush(response);
-                        }
-                    }
-                    catch (Exception e){
-                        log.error("consumer server catch error", e);
-                    }
-                }
-            }
+            FullHttpResponse response = new DefaultFullHttpResponse( HTTP_1_1, OK, Unpooled.wrappedBuffer(new byte[]{1}));
+            response.headers().set(CONTENT_TYPE, "text/plain");
+            response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
+            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+//            FullHttpRequest req = (FullHttpRequest) msg;
+//            req.release();
+//            if (msg instanceof FullHttpRequest) {
+//                FullHttpRequest req = (FullHttpRequest) msg;
+//
+//                HttpMethod httpMethod = req.method();
+//                if (HttpMethod.POST.equals(httpMethod) ) {
+//                    try{
+//                        boolean keepAlive = HttpUtil.isKeepAlive(req);
+//                        HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(req);
+//                        decoder.offer(req);
+//                        List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
+//                        Map<String, String> paramters = new HashMap<>();
+//                        for (InterfaceHttpData parm : parmList) {
+//                            Attribute data = (Attribute) parm;
+//                            paramters.put(data.getName(), data.getValue());
+//                        }
+//
+//                        String interfaceName = paramters.get("interface");
+//                        String method = paramters.get("method");
+//                        String parameterTypesString = paramters.get("parameterTypesString");
+//                        String parameter = paramters.get("parameter");
+//                        AgentRequest agentRequest = (new AgentRequest().initRequest())
+//                                .initData(interfaceName, method, parameterTypesString, parameter);
+//
+//                        ByteBuf byteBuf = null;
+//                        if (agentRequest.isValid()) {
+//                            byte[] bytes = (byte[]) AgentClient.INSTANCE.invoke(agentRequest);
+//                            byteBuf = Unpooled.wrappedBuffer(bytes, 8, bytes.length-8);
+//                        } else {
+//                            byteBuf = ERROR_BUF;
+//                        }
+//
+//                        FullHttpResponse response = new DefaultFullHttpResponse( HTTP_1_1, OK, byteBuf);
+//                        response.headers().set(CONTENT_TYPE, "text/plain");
+//                        response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
+//
+//                        if (!keepAlive) {
+//                            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+//                        } else {
+//                            response.headers().set(CONNECTION, CONNECTION);
+//                            ctx.writeAndFlush(response);
+//                        }
+//                    }
+//                    catch (Exception e){
+//                        log.error("consumer server catch error", e);
+//                    }
+//                }
+//            }
         });
 
     }
