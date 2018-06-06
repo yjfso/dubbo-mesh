@@ -1,11 +1,13 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
+import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcFuture;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,16 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<AgentRespons
         RpcFuture future = AgentRequestHolder.get(requestId);
         if(null != future){
             future.done(response);
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            Request request = new Request();
+            request.setTwoWay(false);
+            request.setEvent(true);
+            ctx.writeAndFlush(request);
         }
     }
 

@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.List;
 
@@ -25,7 +26,6 @@ public class AgentDecoder extends ByteToMessageDecoder {
 
         if (in.readableBytes() < messageLength) {
             in.resetReaderIndex();
-            return;
         } else {
             byte[] messageBody = new byte[messageLength];
             in.readBytes(messageBody);

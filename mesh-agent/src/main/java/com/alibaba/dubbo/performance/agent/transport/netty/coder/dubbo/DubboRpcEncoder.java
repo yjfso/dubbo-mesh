@@ -14,6 +14,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 public class DubboRpcEncoder extends MessageToByteEncoder{
+
+
     // header length.
     protected static final int HEADER_LENGTH = 16;
     // magic header.
@@ -35,21 +37,24 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         // set request and serialization flag.
         header[2] = (byte) (FLAG_REQUEST | 6);
 
-        if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;
-        if (req.isEvent()) header[2] |= FLAG_EVENT;
-
-        // set request id.
-        Bytes.long2bytes(req.getId(), header, 4);
-
-        // encode request data.
         int savedWriteIndex = buffer.writerIndex();
-        buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        encodeRequestData(bos, req.getData());
+        int len = 0;
+        if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;
+        if (req.isEvent()){
+            header[2] |= FLAG_EVENT;
+        } else {
+            // set request id.
+            Bytes.long2bytes(req.getId(), header, 4);
+            // encode request data.
+            buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            encodeRequestData(bos, req.getData());
 
-        int len = bos.size();
-        buffer.writeBytes(bos.toByteArray());
-        Bytes.int2bytes(len, header, 12);
+            len = bos.size();
+            buffer.writeBytes(bos.toByteArray());
+            Bytes.int2bytes(len, header, 12);
+
+        }
 
         // write
         buffer.writerIndex(savedWriteIndex);

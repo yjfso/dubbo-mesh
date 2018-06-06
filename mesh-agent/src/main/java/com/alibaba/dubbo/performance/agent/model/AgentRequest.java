@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.model;
 
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -68,6 +69,14 @@ public class AgentRequest implements AgentSerializable {
         return parameter!=null && parameterTypesString!=null && interfaceName!=null && method!=null;
     }
 
+    public static AgentRequest fromMap(Map<String, String> paramters){
+        String interfaceName = paramters.get("interface");
+        String method = paramters.get("method");
+        String parameterTypesString = paramters.get("parameterTypesString");
+        String parameter = paramters.get("parameter");
+        return (new AgentRequest().initRequest())
+                .initData(interfaceName, method, parameterTypesString, parameter);
+    }
     @Override
     public byte[] toBytes() {
         byte[] data = Bytes.mergeByteWithLength(
