@@ -55,7 +55,7 @@ public class Provider {
     }
 
     private void startWorkThread(){
-        int num = 200;// + weight * 2;
+        int num = 180 + weight * 15;
         providerExecutor = Executors.newFixedThreadPool(num);
     }
 

@@ -49,8 +49,6 @@ public class DubboClient {
         request.setTwoWay(true);
         request.setData(invocation);
 
-        logger.info("requestId=" + request.getId());
-
         RpcFuture future = new RpcFuture();
         AgentRequestHolder.put(request.getId(),future);
 

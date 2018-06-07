@@ -48,7 +48,7 @@ public class Consumer {
     }
 
     private void startWorkThread(){
-        int num = 200;// + weight * 2;
+        int num = 240;// + weight * 2;
         executorService = Executors.newFixedThreadPool(num);
     }
 

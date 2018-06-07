@@ -41,6 +41,7 @@ public class AgentClient {
     public Object invoke(AgentRequest agentRequest) throws Exception {
 
         Endpoint endpoint = connectManager.getEndpoint();
+        logger.info("route to " + endpoint);
 
         Channel channel = endpoint.getChannelManager().getChannel();
         if (channel == null){
