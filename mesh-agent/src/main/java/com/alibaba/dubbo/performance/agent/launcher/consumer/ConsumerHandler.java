@@ -36,7 +36,6 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger log = LoggerFactory.getLogger(ConsumerHandler.class);
-    private final static ByteBuf ERROR_BUF = Unpooled.wrappedBuffer(new byte[]{1, 2, 8,32,42,2});
 
     private Consumer consumer;
 

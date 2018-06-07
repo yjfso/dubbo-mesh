@@ -42,7 +42,6 @@ public class AgentClient {
 
         Endpoint endpoint = connectManager.getEndpoint();
 
-
         Channel channel = endpoint.getChannelManager().getChannel();
         if (channel == null){
             return null;
