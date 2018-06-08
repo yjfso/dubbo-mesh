@@ -4,6 +4,8 @@ import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +16,7 @@ import java.util.concurrent.Executors;
 public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
     private Provider provider;
+    private final static Logger log = LoggerFactory.getLogger(ProviderHandler.class);
 
     ProviderHandler(Provider provider){
         this.provider = provider;
@@ -34,7 +37,7 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
                 response.setBytes((byte[]) result);
                 ctx.writeAndFlush(response);
             } catch (Exception e){
-
+                log.error("provider handler error", e);
             }
         });
 

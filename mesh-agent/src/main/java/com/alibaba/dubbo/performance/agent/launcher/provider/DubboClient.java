@@ -31,7 +31,7 @@ public class DubboClient {
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
         this.connectManager = new ClientConnectManager(
-                new DubboClientInitializer(this)
+                new DubboClientInitializer(this), false
         ).addEndpoint(
                 new Endpoint("127.0.0.1", port)
         );

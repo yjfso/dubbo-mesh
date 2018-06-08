@@ -26,12 +26,16 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 
     private List<Endpoint> endpoints;
     private Endpoint activeEndpoint;
+    private boolean mutiEndpoint;
 
 
-    public ClientConnectManager(ChannelHandler handler){
+    public ClientConnectManager(ChannelHandler handler, boolean mutiEndpoint){
+        this.mutiEndpoint = mutiEndpoint;
         eventLoopGroup = new NioEventLoopGroup();
         this.handler = handler;
-        this.initEndpoints();
+        if (mutiEndpoint){
+            this.initEndpoints();
+        }
         this.initBootstrap();
     }
 
@@ -77,9 +81,13 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
     }
 
     public ConnectManager addEndpoint(Endpoint endpoint){
-        synchronized (this){
-            endpoint.initChannelManager(this);
-            this.endpoints.add(endpoint);
+        endpoint.initChannelManager(this);
+        if(!mutiEndpoint){
+            activeEndpoint = endpoint;
+        } else{
+            synchronized (this){
+                this.endpoints.add(endpoint);
+            }
         }
         return this;
     }

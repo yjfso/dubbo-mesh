@@ -29,7 +29,7 @@ public class AgentClient {
     public AgentClient()  {
         try{
             this.connectManager = new ClientConnectManager(
-                    new AgentClientInitializer(this)
+                    new AgentClientInitializer(this), true
             );
             new EtcdRegistry(System.getProperty("etcd.url"))
                     .watch("com.alibaba.dubbo.performance.demo.provider.IHelloService", connectManager);
