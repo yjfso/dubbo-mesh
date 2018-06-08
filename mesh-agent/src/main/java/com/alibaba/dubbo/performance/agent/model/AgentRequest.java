@@ -16,7 +16,7 @@ public class AgentRequest implements AgentSerializable {
 
 
     public final static ObjectPool<AgentRequest> pool =
-            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(230));
+            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(500));
     private static AtomicLong atomicLong = new AtomicLong();
     private long id;
     private String interfaceName;
