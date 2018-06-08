@@ -44,8 +44,10 @@ public class Provider {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ProviderInitializer(this))
                     .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.SO_SNDBUF, 10240)
+                    .option(ChannelOption.SO_RCVBUF, 10240)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-//                    .childOption(ChannelOption.TCP_NODELAY, false)
+                    .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {

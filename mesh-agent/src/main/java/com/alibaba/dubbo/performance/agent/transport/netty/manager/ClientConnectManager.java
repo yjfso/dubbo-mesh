@@ -43,7 +43,7 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
         bootstrap = new Bootstrap()
                 .group(eventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
-//                .option(ChannelOption.TCP_NODELAY, false)
+                .option(ChannelOption.TCP_NODELAY, false)
 //                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .channel(NioSocketChannel.class)
                 .handler(handler);
