@@ -1,6 +1,11 @@
 package com.alibaba.dubbo.performance.agent.model;
 
 
+
+import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -9,6 +14,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AgentRequest implements AgentSerializable {
 
+
+    public final static ObjectPool<AgentRequest> pool = new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.config);
     private static AtomicLong atomicLong = new AtomicLong();
     private long id;
     private String interfaceName;
@@ -70,12 +77,17 @@ public class AgentRequest implements AgentSerializable {
     }
 
     public static AgentRequest fromMap(Map<String, String> paramters){
+        AgentRequest agentRequest;
         String interfaceName = paramters.get("interface");
         String method = paramters.get("method");
         String parameterTypesString = paramters.get("parameterTypesString");
         String parameter = paramters.get("parameter");
-        return (new AgentRequest().initRequest())
-                .initData(interfaceName, method, parameterTypesString, parameter);
+        try{
+            agentRequest = pool.borrowObject();
+        } catch (Exception e){
+            agentRequest = new AgentRequest().initRequest();
+        }
+        return agentRequest.initData(interfaceName, method, parameterTypesString, parameter);
     }
     @Override
     public byte[] toBytes() {

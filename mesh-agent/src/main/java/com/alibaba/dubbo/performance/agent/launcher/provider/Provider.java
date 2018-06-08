@@ -43,7 +43,7 @@ public class Provider {
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ProviderInitializer(this))
-//                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
 //                    .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();

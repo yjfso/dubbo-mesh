@@ -53,6 +53,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                             rep = new DefaultFullHttpResponse(HTTP_1_1, OK);
                         }
                         HttpUtils.response(ctx, req, rep);
+                        AgentRequest.pool.returnObject(agentRequest);
                     }
                 }
             } catch (Exception e){

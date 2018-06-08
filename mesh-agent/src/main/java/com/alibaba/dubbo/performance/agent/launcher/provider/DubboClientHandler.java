@@ -33,7 +33,7 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<AgentRespons
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            Request request = new Request();
+            Request request = new Request().init();
             request.setTwoWay(false);
             request.setEvent(true);
             ctx.writeAndFlush(request);

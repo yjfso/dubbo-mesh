@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
 import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
+import com.alibaba.dubbo.performance.agent.model.dubbo.RequestFactory;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.util.JsonUtils;
@@ -9,7 +10,11 @@ import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
+import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
 import io.netty.channel.Channel;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +26,7 @@ public class DubboClient {
     private Logger logger = LoggerFactory.getLogger(DubboClient.class);
 
     ConnectManager connectManager;
+    private final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.config);
 
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
@@ -45,8 +51,9 @@ public class DubboClient {
         JsonUtils.writeObject(parameter, writer);
         invocation.setArguments(out.toByteArray());
 
-        Request request = new Request();
-        request.setTwoWay(true);
+        Request request = pool.borrowObject();
+//        new Request();
+//        request.setTwoWay(true);
         request.setData(invocation);
 
         RpcFuture future = new RpcFuture();
@@ -60,6 +67,8 @@ public class DubboClient {
             AgentRequestHolder.remove(request.getId());
         }catch (Exception e){
             e.printStackTrace();
+        } finally {
+            pool.returnObject(request);
         }
         return result;
     }

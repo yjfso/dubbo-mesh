@@ -12,7 +12,13 @@ public class Request {
     private Object mData;
 
     public Request(){
+
+    }
+
+    public Request init(){
         id = atomicLong.getAndIncrement();
+        this.setTwoWay(true);
+        return this;
     }
 
     public long getId() {
