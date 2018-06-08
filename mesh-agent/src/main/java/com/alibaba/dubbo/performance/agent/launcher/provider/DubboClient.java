@@ -26,7 +26,7 @@ public class DubboClient {
     private Logger logger = LoggerFactory.getLogger(DubboClient.class);
 
     ConnectManager connectManager;
-    private final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.config);
+    private final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.getConfig(500));
 
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));

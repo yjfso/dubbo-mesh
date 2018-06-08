@@ -7,12 +7,12 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
  */
 public class ObjectPoolUtils {
 
-    public final static GenericObjectPoolConfig config;
 
-    static {
-        config = new GenericObjectPoolConfig();
-        config.setMaxIdle(250);
-        config.setMaxTotal(250);
-        config.setMinIdle(250);
+    public static GenericObjectPoolConfig getConfig(int num){
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setMaxIdle(num);
+        config.setMaxTotal(num);
+        config.setMinIdle(num);
+        return config;
     }
 }

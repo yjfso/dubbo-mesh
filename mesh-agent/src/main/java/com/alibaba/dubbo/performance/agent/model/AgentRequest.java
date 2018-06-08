@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AgentRequest implements AgentSerializable {
 
 
-    public final static ObjectPool<AgentRequest> pool = new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.config);
+    public final static ObjectPool<AgentRequest> pool =
+            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(230));
     private static AtomicLong atomicLong = new AtomicLong();
     private long id;
     private String interfaceName;
