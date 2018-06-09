@@ -65,7 +65,7 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
                         }
                         activeEndpoint = min;
                     }
-                    Thread.sleep(3);
+                    Thread.sleep(1);
                 } catch (Exception e){
                     log.error("load blance thread catch error", e);
                 }
