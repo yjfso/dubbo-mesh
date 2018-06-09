@@ -94,17 +94,16 @@ public class AgentRequest implements AgentSerializable {
     }
 
     public static AgentRequest fromMap(Map<String, String> paramters){
-        log.error("from");
         AgentRequest agentRequest;
         String interfaceName = paramters.get("interface");
         String method = paramters.get("method");
         String parameterTypesString = paramters.get("parameterTypesString");
         String parameter = paramters.get("parameter");
-//        try{
-//            agentRequest = pool.borrowObject();
-//        } catch (Exception e){
+        try{
+            agentRequest = pool.borrowObject();
+        } catch (Exception e){
             agentRequest = new AgentRequest().initRequest();
-//        }
+        }
         return agentRequest.initData(interfaceName, method, parameterTypesString, parameter);
     }
     @Override
@@ -166,7 +165,7 @@ public class AgentRequest implements AgentSerializable {
 
     public void done(FullHttpResponse rep) throws Exception{
         HttpUtils.response(ctx, keepAlive,  rep);
-//        returnSelf();
+        returnSelf();
     }
 
     public void done(byte[] bytes) throws Exception {
