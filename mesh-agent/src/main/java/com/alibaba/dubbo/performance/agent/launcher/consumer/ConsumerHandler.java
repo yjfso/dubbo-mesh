@@ -41,19 +41,14 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();
                     if (HttpMethod.POST.equals(httpMethod) ) {
+                        boolean keepAlive = HttpUtil.isKeepAlive(req);
                         Map<String, String> paramters = HttpUtils.mapPostData(req);
                         AgentRequest agentRequest = AgentRequest.fromMap(paramters);
-                        FullHttpResponse rep;
-                        ByteBuf byteBuf = null;
-                        if (agentRequest.isValid()) {
-                            byte[] bytes = (byte[]) AgentClient.INSTANCE.invoke(agentRequest);
-                            byteBuf = Unpooled.wrappedBuffer(bytes, 8, bytes.length-8);
-                            rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
-                        } else {
-                            rep = new DefaultFullHttpResponse(HTTP_1_1, OK);
+                        agentRequest.setCtx(ctx);
+                        agentRequest.setKeepAlive(keepAlive);
+                        if (!(agentRequest.isValid() && AgentClient.INSTANCE.invoke(agentRequest))) {
+                            agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
                         }
-                        HttpUtils.response(ctx, req, rep);
-                        AgentRequest.pool.returnObject(agentRequest);
                     }
                 }
             } catch (Exception e){

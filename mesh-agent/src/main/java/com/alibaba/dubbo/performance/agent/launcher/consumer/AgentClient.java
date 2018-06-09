@@ -12,6 +12,9 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -21,6 +24,7 @@ public class AgentClient {
     private static Logger logger = LoggerFactory.getLogger(DubboClient.class);
     private ConnectManager connectManager;
     public static AgentClient INSTANCE;
+    final static Map<Long,AgentRequest> processingRpc = new ConcurrentHashMap<>(500);
 
     public static void init(){
         INSTANCE = new AgentClient();
@@ -38,29 +42,32 @@ public class AgentClient {
         }
     }
 
-    public Object invoke(AgentRequest agentRequest) throws Exception {
+    public boolean invoke(AgentRequest agentRequest) throws Exception {
 
         Endpoint endpoint = connectManager.getEndpoint();
         logger.info("route to " + endpoint);
 
         Channel channel = endpoint.getChannelManager().getChannel();
         if (channel == null){
-            return null;
+            return false;
         }
-        channel.writeAndFlush(agentRequest);
-
-        RpcFuture future = new RpcFuture();
-        AgentRequestHolder.put(agentRequest.getId(), future);
         endpoint.request();
-        Object result = null;
-        try {
-            result = future.get();
-            AgentRequestHolder.remove(agentRequest.getId());
-            endpoint.response();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return result;
+        agentRequest.setEndpoint(endpoint);
+        processingRpc.put(agentRequest.getId(), agentRequest);
+        channel.writeAndFlush(agentRequest);
+        return true;
+
+//        RpcFuture future = new RpcFuture();
+//        AgentRequestHolder.put(agentRequest.getId(), future);
+//        Object result = null;
+//        try {
+//            result = future.get();
+//            AgentRequestHolder.remove(agentRequest.getId());
+//            endpoint.response();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return result;
     }
 
     public ConnectManager getConnectManager() {

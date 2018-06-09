@@ -16,18 +16,19 @@ import java.util.concurrent.Executors;
  */
 public class Consumer {
 
-    private static Consumer INSTANCE;
+    public static Consumer INSTANCE;
 
     ExecutorService executorService;
 
     private Consumer() throws Exception{
+        INSTANCE = this;
         AgentClient.init();
         startWorkThread();
         startServer();
     }
 
     public static void init() throws Exception{
-        INSTANCE = new Consumer();
+        new Consumer();
     }
 
     private void startServer() throws Exception{

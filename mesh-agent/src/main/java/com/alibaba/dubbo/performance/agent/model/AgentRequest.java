@@ -2,12 +2,24 @@ package com.alibaba.dubbo.performance.agent.model;
 
 
 
+import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -15,14 +27,18 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AgentRequest implements AgentSerializable {
 
 
+    private final static Logger log = LoggerFactory.getLogger(AgentRequest.class);
     public final static ObjectPool<AgentRequest> pool =
-            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(500));
+            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(700));
     private static AtomicLong atomicLong = new AtomicLong();
     private long id;
     private String interfaceName;
     private String method;
     private String parameterTypesString;
     private String parameter;
+    private Endpoint endpoint;
+    private ChannelHandlerContext ctx;
+    private boolean keepAlive = true;
 
 
     public AgentRequest(){
@@ -78,16 +94,17 @@ public class AgentRequest implements AgentSerializable {
     }
 
     public static AgentRequest fromMap(Map<String, String> paramters){
+        log.error("from");
         AgentRequest agentRequest;
         String interfaceName = paramters.get("interface");
         String method = paramters.get("method");
         String parameterTypesString = paramters.get("parameterTypesString");
         String parameter = paramters.get("parameter");
-        try{
-            agentRequest = pool.borrowObject();
-        } catch (Exception e){
+//        try{
+//            agentRequest = pool.borrowObject();
+//        } catch (Exception e){
             agentRequest = new AgentRequest().initRequest();
-        }
+//        }
         return agentRequest.initData(interfaceName, method, parameterTypesString, parameter);
     }
     @Override
@@ -115,5 +132,47 @@ public class AgentRequest implements AgentSerializable {
         this.parameterTypesString = strings[2];
         this.parameter = strings[3];
         return this;
+    }
+
+    public Endpoint getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public ChannelHandlerContext getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(ChannelHandlerContext ctx) {
+        this.ctx = ctx;
+    }
+
+    private void returnSelf() throws Exception{
+        endpoint = null;
+        ctx = null;
+        pool.returnObject(this);
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
+    public void done(FullHttpResponse rep) throws Exception{
+        HttpUtils.response(ctx, keepAlive,  rep);
+//        returnSelf();
+    }
+
+    public void done(byte[] bytes) throws Exception {
+        endpoint.response();
+        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 8, bytes.length-8);
+        FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
+        done(rep);
     }
 }

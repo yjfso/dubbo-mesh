@@ -1,15 +1,20 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
+import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcFuture;
 import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
+import com.alibaba.dubbo.performance.agent.util.Bytes;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AgentClientHandler extends ChannelInboundHandlerAdapter {
 
-    private AgentClient agentClient;
+    private final static Logger log = LoggerFactory.getLogger(AgentClientHandler.class);
 
+    private AgentClient agentClient;
     public AgentClientHandler(AgentClient agentClient){
         this.agentClient = agentClient;
     }
@@ -17,12 +22,21 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        AgentResponse agentResponse = new AgentResponse().fromBytes((byte[]) msg);
-        long id = agentResponse.getRequestId();
-        RpcFuture future = AgentRequestHolder.get(id);
-        if(null != future){
-            future.done(agentResponse);
-        }
+        Consumer.INSTANCE.executorService.submit(
+                ()->{
+                    try{
+                        byte[] bytes = (byte[]) msg;
+                        long id = Bytes.bytes2long(bytes, 0);//agentResponse.getRequestId();
+                        AgentRequest agentRequest = AgentClient.processingRpc.get(id);
+                        if(null != agentRequest){
+                            agentRequest.done(bytes);
+                        }
+                    } catch (Exception e){
+                        log.error("consumer client response error", e);
+                    }
+                }
+        );
+
     }
 
     @Override

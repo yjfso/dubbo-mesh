@@ -35,13 +35,13 @@ public class HttpUtils {
         return paramters;
     }
 
-    public static void response(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse response){
+    public static void response(ChannelHandlerContext ctx, boolean keepAlive,  FullHttpResponse response){
         response.headers().set(CONTENT_TYPE, "text/plain");
         response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
-        if (HttpUtil.isKeepAlive(req)) {
+        if(keepAlive){
             response.headers().set(CONNECTION, CONNECTION);
             ctx.writeAndFlush(response);
-        } else {
+        } else{
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
     }
