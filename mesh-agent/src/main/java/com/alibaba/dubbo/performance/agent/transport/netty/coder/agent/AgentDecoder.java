@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.coder.agent;
 
 
+import com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo.DubboRpcDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -8,28 +9,43 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AgentDecoder extends ByteToMessageDecoder {
 
+
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (in.readableBytes() < 4) {
-            return;
-        }
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+        try {
+            do {
+                try {
+                    byteBuf.markReaderIndex();
+                    int readable = byteBuf.readableBytes();
+                    if (readable < 4) {
+                        byteBuf.resetReaderIndex();
+                        break;
+                    }
 
-        in.markReaderIndex();
-        int messageLength = in.readInt();
+                    int messageLength = byteBuf.readInt();
 
-        if (messageLength < 0) {
-            ctx.close();
-        }
+                    if (readable < messageLength + 4) {
+                        byteBuf.resetReaderIndex();
+                        break;
+                    }
 
-        if (in.readableBytes() < messageLength) {
-            in.resetReaderIndex();
-        } else {
-            byte[] messageBody = new byte[messageLength];
-            in.readBytes(messageBody);
-            out.add(messageBody);
+                    byte[] messageBody = new byte[messageLength];
+                    byteBuf.readBytes(messageBody);
+                    out.add(messageBody);
+                } catch (Exception e) {
+                    throw e;
+                }
+
+            } while (byteBuf.isReadable());
+        } finally {
+            if (byteBuf.isReadable()) {
+                byteBuf.discardReadBytes();
+            }
         }
     }
+
 }

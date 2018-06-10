@@ -54,7 +54,7 @@ public class AgentClient {
         endpoint.request();
         agentRequest.setEndpoint(endpoint);
         processingRpc.put(agentRequest.getId(), agentRequest);
-        channel.writeAndFlush(agentRequest);
+        channel.writeAndFlush(agentRequest.toBytes());
         return true;
 
 //        RpcFuture future = new RpcFuture();

@@ -122,9 +122,7 @@ public class AgentRequest implements AgentSerializable {
 
     @Override
     public AgentRequest fromBytes(byte[] bytes) {
-        byte[] idBytes = new byte[8];
-        System.arraycopy(bytes, 0, idBytes , 0,8);
-        this.id = Bytes.bytes2long(idBytes);
+        this.id = Bytes.bytes2long(bytes);
         String[] strings = Bytes.splitByteToStringsByLength(bytes, 4, 8);
         this.interfaceName = strings[0];
         this.method = strings[1];

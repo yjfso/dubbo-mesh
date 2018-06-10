@@ -2,6 +2,7 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.AgentResponse;
+import com.alibaba.dubbo.performance.agent.model.Bytes;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -25,17 +26,11 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        byte[] bytes = (byte[]) msg;
         provider.providerExecutor.submit(()->{
             try{
-                AgentRequest request = new AgentRequest().fromBytes(bytes);
-                Object result = Provider.dubboClient.invoke(request.getInterfaceName(),
-                        request.getMethod(), request.getParameterTypesString() ,request.getParameter());
+                byte[] bytes = (byte[]) msg;
+                Provider.dubboClient.invoke(bytes, ctx);
 
-                AgentResponse response = new AgentResponse();
-                response.setRequestId(request.getId());
-                response.setBytes((byte[]) result);
-                ctx.writeAndFlush(response);
             } catch (Exception e){
                 log.error("provider handler error", e);
             }

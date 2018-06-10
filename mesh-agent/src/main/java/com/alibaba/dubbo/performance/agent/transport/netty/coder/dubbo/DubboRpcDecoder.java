@@ -17,11 +17,10 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-
         try {
             do {
                 int savedReaderIndex = byteBuf.readerIndex();
-                Object msg = null;
+                Object msg;
                 try {
                     msg = decode2(byteBuf);
                 } catch (Exception e) {
@@ -40,11 +39,10 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
             }
         }
 
-
         //list.add(decode2(byteBuf));
     }
 
-    enum DecodeResult {
+    public enum DecodeResult {
         NEED_MORE_INPUT, SKIP_INPUT
     }
 
@@ -58,7 +56,6 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
      */
     private Object decode2(ByteBuf byteBuf){
 
-        int savedReaderIndex = byteBuf.readerIndex();
         int readable = byteBuf.readableBytes();
 
         if (readable < HEADER_LENGTH) {
@@ -74,9 +71,13 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
             return DecodeResult.NEED_MORE_INPUT;
         }
 
-        byteBuf.readerIndex(savedReaderIndex);
-        byte[] data = new byte[tt];
-        byteBuf.readBytes(data);
+//
+        byte[] response = new byte[8 + len - 3];
+        System.arraycopy(header, 4, response, 0, 8);
+        int readerIndex = byteBuf.readerIndex();
+        byteBuf.readerIndex(readerIndex + 2);
+        byteBuf.readBytes(response, 8, len - 3);
+        byteBuf.readerIndex(readerIndex + len);
 
 
 
@@ -85,15 +86,16 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
 
         // HEADER_LENGTH + 1，忽略header & Response value type的读取，直接读取实际Return value
         // dubbo返回的body中，前后各有一个换行，去掉
-        byte[] subArray = Arrays.copyOfRange(data,HEADER_LENGTH + 2, data.length -1 );
+//        byte[] subArray = Arrays.copyOfRange(data,HEADER_LENGTH + 2, data.length -1 );
 
 
-        byte[] requestIdBytes = Arrays.copyOfRange(data,4,12);
-        long requestId = Bytes.bytes2long(requestIdBytes,0);
-
-        AgentResponse response = new AgentResponse();
-        response.setRequestId(requestId);
-        response.setBytes(subArray);
+//        long requestId = Bytes.bytes2long(header, 4);
+//
+////        byte[] result = new byte[];
+//
+//        AgentResponse response = new AgentResponse();
+//        response.setRequestId(requestId);
+//        response.setBytes(subArray);
         return response;
     }
 }

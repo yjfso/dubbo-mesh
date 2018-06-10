@@ -18,13 +18,14 @@ import java.util.concurrent.Executors;
  */
 public class Provider {
 
-    private static Provider INSTANCE;
+    public static Provider INSTANCE;
 
     static DubboClient dubboClient;
     private int weight = 1;
     ExecutorService providerExecutor;
 
     private Provider() throws Exception{
+        INSTANCE = this;
         dubboClient = new DubboClient();
         this.weight = Integer.valueOf(System.getProperty("server.weight"));
         registerServer();
@@ -32,7 +33,7 @@ public class Provider {
         startServer();
     }
     public static void init() throws Exception{
-        INSTANCE = new Provider();
+        new Provider();
     }
 
     private void startServer() throws Exception{

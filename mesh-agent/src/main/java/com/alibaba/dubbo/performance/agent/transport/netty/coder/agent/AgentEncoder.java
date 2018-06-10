@@ -10,9 +10,13 @@ public class AgentEncoder extends MessageToByteEncoder {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final Object message, final ByteBuf out) throws Exception {
-        byte[] body = ((AgentSerializable) message).toBytes();
-        int dataLength = body.length;
-        out.writeInt(dataLength);
-        out.writeBytes(body);
+        try {
+            byte[] body = (byte[]) message;//((AgentSerializable) message).toBytes();
+            int dataLength = body.length;
+            out.writeInt(dataLength);
+            out.writeBytes(body);
+        } catch (Exception e){
+            throw e;
+        }
     }
 }
