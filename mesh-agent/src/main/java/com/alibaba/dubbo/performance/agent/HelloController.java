@@ -16,8 +16,6 @@ public class HelloController {
                          @RequestParam("method") String method,
                          @RequestParam("parameterTypesString") String parameterTypesString,
                          @RequestParam("parameter") String parameter) throws Exception {
-        AgentRequest agentRequest = (new AgentRequest().initRequest())
-                .initData(interfaceName, method, parameterTypesString, parameter);
 //        byte[] bytes = (byte[]) AgentClient.INSTANCE.invoke(agentRequest);
 //        String s = new String(bytes, 8, bytes.length-8);
         return Integer.valueOf("1");

@@ -6,17 +6,14 @@ import com.alibaba.dubbo.performance.agent.model.dubbo.RequestFactory;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.util.JsonUtils;
-import com.alibaba.dubbo.performance.agent.model.dubbo.RpcFuture;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
-import com.alibaba.dubbo.performance.agent.model.AgentRequestHolder;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
 import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DubboClient {
     private Logger logger = LoggerFactory.getLogger(DubboClient.class);
-    final Map<Long, Request> processingRpc = new ConcurrentHashMap<>(200);
+    final Map<Long, Request> processingRpc = new ConcurrentHashMap<>(260);
 
     ConnectManager connectManager;
-    public final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.getConfig(230));
+    public final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.getConfig(260));
 
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));

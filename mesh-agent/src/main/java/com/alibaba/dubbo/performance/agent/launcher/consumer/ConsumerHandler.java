@@ -1,7 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
-import com.alibaba.dubbo.performance.agent.model.AgentResponse;
 import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

@@ -24,18 +24,25 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
     protected static final byte FLAG_REQUEST = (byte) 0x80;
     protected static final byte FLAG_TWOWAY = (byte) 0x40;
     protected static final byte FLAG_EVENT = (byte) 0x20;
+    private final static byte[] headerBase = new byte[HEADER_LENGTH];
+
+    static {
+        Bytes.short2bytes(MAGIC, headerBase);
+        headerBase[2] = (byte) (FLAG_REQUEST | 6);
+    }
+
+    private byte[] getNewHeader(){
+        byte[] header = new byte[HEADER_LENGTH];
+        System.arraycopy(headerBase, 0, header, 0, 3);
+        return header;
+    }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf buffer) throws Exception {
         Request req = (Request)msg;
 
         // header.
-        byte[] header = new byte[HEADER_LENGTH];
-        // set magic number.
-        Bytes.short2bytes(MAGIC, header);
-
-        // set request and serialization flag.
-        header[2] = (byte) (FLAG_REQUEST | 6);
+        byte[] header = getNewHeader();
 
         int savedWriteIndex = buffer.writerIndex();
         int len = 0;
@@ -61,6 +68,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         buffer.writeBytes(header); // write header.
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);
     }
+
 
     public void encodeRequestData(OutputStream out, Object data) throws Exception {
         RpcInvocation inv = (RpcInvocation)data;

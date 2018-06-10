@@ -42,10 +42,10 @@ public class AgentRequest implements AgentSerializable {
 
 
     public AgentRequest(){
+        id = atomicLong.getAndIncrement();
     }
 
     public AgentRequest initRequest(){
-        id = atomicLong.getAndIncrement();
         return this;
     }
 
@@ -102,7 +102,7 @@ public class AgentRequest implements AgentSerializable {
         try{
             agentRequest = pool.borrowObject();
         } catch (Exception e){
-            agentRequest = new AgentRequest().initRequest();
+            agentRequest = new AgentRequest();//.initRequest();
         }
         return agentRequest.initData(interfaceName, method, parameterTypesString, parameter);
     }

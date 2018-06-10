@@ -45,8 +45,6 @@ public class Provider {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ProviderInitializer(this))
                     .option(ChannelOption.SO_BACKLOG, 1024)
-                    .option(ChannelOption.SO_SNDBUF, 10240)
-                    .option(ChannelOption.SO_RCVBUF, 10240)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();
@@ -58,7 +56,7 @@ public class Provider {
     }
 
     private void startWorkThread(){
-        int num = 180 + weight * 15;
+        int num = 50 + weight * 15;
         providerExecutor = Executors.newFixedThreadPool(num);
     }
 
