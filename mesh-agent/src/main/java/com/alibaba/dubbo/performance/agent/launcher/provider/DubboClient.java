@@ -10,6 +10,7 @@ import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
 import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.pool2.ObjectPool;
@@ -53,11 +54,7 @@ public class DubboClient {
         invocation.setMethodName(method);
         invocation.setAttachment("path", interfaceName);
         invocation.setParameterTypes(parameterTypesString);    // Dubbo内部用"Ljava/lang/String"来表示参数类型是String
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
-        JsonUtils.writeObject(parameter, writer);
-        invocation.setArguments(out.toByteArray());
+        invocation.setArguments(parameter);
 
         Request request = pool.borrowObject();
         request.setId(requestId);

@@ -21,11 +21,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * RPC Invocation.
- *
- * @serial Don't change the class name and properties.
- */
+
 public class RpcInvocation implements Serializable {
 
     private static final long serialVersionUID = -4355285085441097045L;
@@ -34,7 +30,7 @@ public class RpcInvocation implements Serializable {
 
     private String parameterTypes;
 
-    private byte[] arguments;
+    private String arguments;
 
     private Map<String, String> attachments;
 
@@ -57,14 +53,13 @@ public class RpcInvocation implements Serializable {
         this.parameterTypes = parameterTypes;
     }
 
-    public byte[] getArguments() {
+    public String getArguments() {
         return arguments;
     }
 
-    public void setArguments(byte[] arguments) {
+    public void setArguments(String arguments) {
         this.arguments = arguments;
     }
-
 
     public void setAttachment(String key, String value) {
         if (attachments == null) {

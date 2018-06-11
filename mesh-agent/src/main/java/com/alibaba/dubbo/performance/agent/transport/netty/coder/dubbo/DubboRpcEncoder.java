@@ -74,6 +74,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         RpcInvocation inv = (RpcInvocation)data;
 
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
+//        out.write();
 
         JsonUtils.writeObject(inv.getAttachment("dubbo", "2.0.1"), writer);
         JsonUtils.writeObject(inv.getAttachment("path"), writer);
@@ -81,7 +82,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         JsonUtils.writeObject(inv.getMethodName(), writer);
         JsonUtils.writeObject(inv.getParameterTypes(), writer);
 
-        JsonUtils.writeBytes(inv.getArguments(), writer);
+        JsonUtils.writeObject(inv.getArguments(), writer);
         JsonUtils.writeObject(inv.getAttachments(), writer);
     }
 

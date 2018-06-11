@@ -17,6 +17,8 @@
 package com.alibaba.dubbo.performance.agent.model;
 
 
+import com.alibaba.dubbo.performance.agent.common.Const;
+
 /**
  * CodecUtils.
  */
@@ -104,5 +106,15 @@ public class Bytes {
                 (((long) b[0]) << 56);
     }
 
+    public static void writeStringWithCRAndQuota(byte[] dst, int dstPos, String value){
+        int index = dstPos;
+        dst[index++] = Const.QUOTA;
+        byte[] bytes = value.getBytes();
+        int length = bytes.length;
+        System.arraycopy(bytes, 0, dst, index, length);
+        index += length;
+        dst[index++] = Const.QUOTA;
+        dst[index] = Const.CR;
+    }
     
 }
