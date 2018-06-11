@@ -3,6 +3,7 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.agent.registry.IRegistry;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -21,13 +22,12 @@ public class Provider {
     public static Provider INSTANCE;
 
     static DubboClient dubboClient;
-    private int weight = 1;
+    private int weight = Integer.valueOf(System.getProperty("server.weight"));
     ExecutorService providerExecutor;
 
     private Provider() throws Exception{
         INSTANCE = this;
         dubboClient = new DubboClient();
-        this.weight = Integer.valueOf(System.getProperty("server.weight"));
         registerServer();
         startWorkThread();
         startServer();
@@ -45,6 +45,8 @@ public class Provider {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ProviderInitializer(this))
                     .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();
@@ -56,7 +58,7 @@ public class Provider {
     }
 
     private void startWorkThread(){
-        int num = 50 + weight * 15;
+        int num = 210;
         providerExecutor = Executors.newFixedThreadPool(num);
     }
 

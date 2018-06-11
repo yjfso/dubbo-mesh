@@ -4,6 +4,7 @@ import com.alibaba.dubbo.performance.agent.util.Bytes;
 import com.alibaba.dubbo.performance.agent.util.JsonUtils;
 import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

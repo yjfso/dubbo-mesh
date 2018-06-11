@@ -99,16 +99,16 @@ public class AgentRequest implements AgentSerializable {
 
     public static AgentRequest fromMap(Map<String, String> paramters){
         AgentRequest agentRequest;
-        String interfaceName = paramters.get("interface");
-        String method = paramters.get("method");
-        String parameterTypesString = paramters.get("parameterTypesString");
-        String parameter = paramters.get("parameter");
         try{
             agentRequest = pool.borrowObject();
         } catch (Exception e){
             agentRequest = new AgentRequest();//.initRequest();
         }
-        return agentRequest.initData(interfaceName, method, parameterTypesString, parameter);
+        return agentRequest.initData(
+                paramters.get("interface"),
+                paramters.get("method"),
+                paramters.get("parameterTypesString"),
+                paramters.get("parameter"));
     }
     @Override
     public byte[] toBytes() {

@@ -1,10 +1,9 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.manager;
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
@@ -44,6 +43,8 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
                 .group(eventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, false)
+                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .channel(NioSocketChannel.class)
                 .handler(handler);
@@ -59,13 +60,14 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
                         Endpoint min = iterator.next();
                         while (iterator.hasNext()) {
                             Endpoint endpoint = iterator.next();
-                            if (min.nowRequestNum * endpoint.weight > endpoint.nowRequestNum * min.weight) {
+                            int itemRequest = endpoint.nowRequestNum;
+                            if ((min.nowRequestNum * endpoint.weight > itemRequest * min.weight) && itemRequest <= Const.MAX_DUBBO_REQUEST) {
                                 min = endpoint;
                             }
                         }
                         activeEndpoint = min;
                     }
-                    Thread.sleep(1);
+                    Thread.sleep(Const.LOAD_BALANCE_REFRESH_TIME);
                 } catch (Exception e){
                     log.error("load blance thread catch error", e);
                 }

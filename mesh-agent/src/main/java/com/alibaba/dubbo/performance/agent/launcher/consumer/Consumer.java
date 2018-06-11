@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -49,7 +50,7 @@ public class Consumer {
     }
 
     private void startWorkThread(){
-        int num = 512;// + weight * 2;
+        int num = Const.CONSUMER_THREAD_NUM;// + weight * 2;
         executorService = Executors.newFixedThreadPool(num);
     }
 
