@@ -26,10 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DubboClient {
     private Logger logger = LoggerFactory.getLogger(DubboClient.class);
-    final Map<Long, Request> processingRpc = new ConcurrentHashMap<>(260);
 
     ConnectManager connectManager;
-    public final static ObjectPool<Request> pool = new GenericObjectPool<>(new RequestFactory(), ObjectPoolUtils.getConfig(260));
+
 
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
@@ -41,8 +40,8 @@ public class DubboClient {
     }
 
     public void invoke(byte[] bytes, ChannelHandlerContext ctx) throws Exception {
-        long requestId = Bytes.bytes2long(bytes);
-        String[] strings = Bytes.splitByteToStringsByLength(bytes, 4, 8);
+//        int requestId = Bytes.bytes2int(bytes, 0);
+        String[] strings = Bytes.splitByteToStringsByLength(bytes, 4, 4);
         String interfaceName = strings[0];
         String method = strings[1];
         String parameterTypesString = strings[2];
@@ -56,8 +55,8 @@ public class DubboClient {
         invocation.setParameterTypes(parameterTypesString);    // Dubbo内部用"Ljava/lang/String"来表示参数类型是String
         invocation.setArguments(parameter);
 
-        Request request = pool.borrowObject();
-        request.setId(requestId);
+        Request request = Request.getRequest();
+        request.setAgentRequest(bytes);
         request.setResponseData(ctx);
 //        new Request();
 //        request.setTwoWay(true);
@@ -65,7 +64,7 @@ public class DubboClient {
 
 //        RpcFuture future = new RpcFuture();
 //        AgentRequestHolder.put(request.getId(),future);
-        processingRpc.put(requestId, request);
+//        processingRpc.put(requestId, request);
 
         channel.writeAndFlush(request);
 

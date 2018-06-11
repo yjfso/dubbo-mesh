@@ -51,7 +51,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
             header[2] |= FLAG_EVENT;
         } else {
             // set request id.
-            Bytes.long2bytes(req.getId(), header, 4);
+            Bytes.int2bytes(req.getId(), header, 8);
             // encode request data.
             buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();

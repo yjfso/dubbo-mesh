@@ -23,8 +23,8 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] response) {
         Provider.INSTANCE.providerExecutor.submit(
                 ()->{
-                    long requestId = Bytes.bytes2long(response, 0);
-                    Request request = Provider.dubboClient.processingRpc.get(requestId);
+                    int requestId = Bytes.bytes2int(response, 0);
+                    Request request = Request.requests[requestId];
                     if(null != request){
                         request.done(response);
                     }

@@ -71,11 +71,11 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
         }
 
 //
-        byte[] response = new byte[8 + len - 3];
-        System.arraycopy(header, 4, response, 0, 8);
+        byte[] response = new byte[4 + len - 3];
+        System.arraycopy(header, 8, response, 0, 4);
         int readerIndex = byteBuf.readerIndex();
         byteBuf.readerIndex(readerIndex + 2);
-        byteBuf.readBytes(response, 8, len - 3);
+        byteBuf.readBytes(response, 4, len - 3);
         byteBuf.readerIndex(readerIndex + len);
 
 

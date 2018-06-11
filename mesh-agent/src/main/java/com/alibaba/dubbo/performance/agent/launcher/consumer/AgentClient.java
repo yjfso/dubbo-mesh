@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.launcher.provider.DubboClient;
@@ -22,7 +23,6 @@ public class AgentClient {
     private static Logger logger = LoggerFactory.getLogger(DubboClient.class);
     private ConnectManager connectManager;
     public static AgentClient INSTANCE;
-    final static Map<Long,AgentRequest> processingRpc = new ConcurrentHashMap<>(500);
 
     public static void init(){
         INSTANCE = new AgentClient();
@@ -51,21 +51,8 @@ public class AgentClient {
         }
         endpoint.request();
         agentRequest.setEndpoint(endpoint);
-        processingRpc.put(agentRequest.getId(), agentRequest);
         channel.writeAndFlush(agentRequest.toBytes());
         return true;
-
-//        RpcFuture future = new RpcFuture();
-//        AgentRequestHolder.put(agentRequest.getId(), future);
-//        Object result = null;
-//        try {
-//            result = future.get();
-//            AgentRequestHolder.remove(agentRequest.getId());
-//            endpoint.response();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        return result;
     }
 
     public ConnectManager getConnectManager() {

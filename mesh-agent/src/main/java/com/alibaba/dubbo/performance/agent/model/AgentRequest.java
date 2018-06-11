@@ -2,6 +2,7 @@ package com.alibaba.dubbo.performance.agent.model;
 
 
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -29,9 +31,10 @@ public class AgentRequest implements AgentSerializable {
 
     private final static Logger log = LoggerFactory.getLogger(AgentRequest.class);
     public final static ObjectPool<AgentRequest> pool =
-            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(700));
-    private static AtomicLong atomicLong = new AtomicLong();
-    private long id;
+            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(Const.AGENT_REQUEST_NUM));
+    public final static AgentRequest[] requests = new AgentRequest[Const.AGENT_REQUEST_NUM];
+    private static AtomicInteger atomicInteger = new AtomicInteger();
+    private int id;
     private String interfaceName;
     private String method;
     private String parameterTypesString;
@@ -42,7 +45,8 @@ public class AgentRequest implements AgentSerializable {
 
 
     public AgentRequest(){
-        id = atomicLong.getAndIncrement();
+        id = atomicInteger.getAndIncrement();
+        requests[id] = this;
     }
 
     public AgentRequest initRequest(){
@@ -65,12 +69,12 @@ public class AgentRequest implements AgentSerializable {
         return this;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public static AtomicLong getAtomicLong() {
-        return atomicLong;
+    public static AtomicInteger getAtomicInteger() {
+        return atomicInteger;
     }
 
     public String getInterfaceName() {
@@ -114,15 +118,15 @@ public class AgentRequest implements AgentSerializable {
                 parameterTypesString.getBytes(),
                 parameter.getBytes()
         );
-        byte[] result = new byte[8+ data.length];
-        System.arraycopy(Bytes.long2bytes(id), 0, result, 0, 8);
-        System.arraycopy(data, 0, result, 8, data.length);
+        byte[] result = new byte[4 + data.length];
+        System.arraycopy(Bytes.int2bytes(id), 0, result, 0, 4);
+        System.arraycopy(data, 0, result, 4, data.length);
         return result;
     }
 
     @Override
     public AgentRequest fromBytes(byte[] bytes) {
-        this.id = Bytes.bytes2long(bytes);
+        this.id = Bytes.bytes2int(bytes, 0);
         String[] strings = Bytes.splitByteToStringsByLength(bytes, 4, 8);
         this.interfaceName = strings[0];
         this.method = strings[1];
@@ -168,7 +172,7 @@ public class AgentRequest implements AgentSerializable {
 
     public void done(byte[] bytes) throws Exception {
         endpoint.response();
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 8, bytes.length-8);
+        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 4, bytes.length-4);
         FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
         done(rep);
     }

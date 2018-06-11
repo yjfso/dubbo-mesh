@@ -21,7 +21,7 @@ public class RequestFactory extends BasePooledObjectFactory<Request>{
         return new DefaultPooledObject<>(request);
     }
 
-    public void activateObject(PooledObject<Request> p) throws Exception {
-        p.getObject().init();
-    }
+//    public void activateObject(PooledObject<Request> p) throws Exception {
+//        p.getObject().init();
+//    }
 }
