@@ -13,11 +13,6 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
 
 
     private final static Logger log = LoggerFactory.getLogger(DubboClientHandler.class);
-    private DubboClient dubboClient;
-
-    public DubboClientHandler(DubboClient dubboClient){
-        this.dubboClient = dubboClient;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] response) {
@@ -34,6 +29,7 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        log.info("dubbo client userEventTriggered");
         if (evt instanceof IdleStateEvent) {
             Request request = new Request().init();
             request.setTwoWay(false);

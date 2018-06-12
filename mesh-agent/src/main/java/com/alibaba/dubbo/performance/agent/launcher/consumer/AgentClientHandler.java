@@ -19,8 +19,9 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        Consumer.INSTANCE.executorService.submit(
-                ()->{
+//        Consumer.INSTANCE.executorService.submit(
+//                ()->{
+        log.info("get provider response");
                     try{
                         byte[] bytes = (byte[]) msg;
                         int id = Bytes.bytes2int(bytes, 0);//agentResponse.getRequestId();
@@ -31,8 +32,8 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
                     } catch (Exception e){
                         log.error("consumer client response error", e);
                     }
-                }
-        );
+//                }
+//        );
     }
 
     @Override

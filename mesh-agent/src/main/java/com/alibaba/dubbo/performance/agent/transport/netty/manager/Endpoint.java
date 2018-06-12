@@ -14,9 +14,9 @@ public class Endpoint {
     private final int port;
     int nowRequestNum = 0;
     private final AtomicInteger requestNum = new AtomicInteger();
-    int channelNum = 2;
+    int channelNum = 8;
 
-    int weight = 1;
+    int weight = 0;
     private FixedChannelPool fixedChannelPool;
 
     public Endpoint(String host,int port){
@@ -33,12 +33,16 @@ public class Endpoint {
     }
 
     public Future<Channel> getChannelFuture(){
-        nowRequestNum = requestNum.incrementAndGet();
+        if (weight>0){
+            nowRequestNum = requestNum.incrementAndGet();
+        }
         return fixedChannelPool.acquire();
     }
 
     public void returnChannel(Channel channel){
-        nowRequestNum = requestNum.decrementAndGet();
+        if (weight>0){
+            nowRequestNum = requestNum.decrementAndGet();
+        }
         fixedChannelPool.release(channel);
     }
 
@@ -77,5 +81,16 @@ public class Endpoint {
     public Endpoint setWeight(int weight) {
         this.weight = weight;
         return this;
+    }
+
+    public void writeAndFlush(Object object){
+        getChannelFuture().addListener((FutureListener<Channel>) f1 -> {
+            if (f1.isSuccess()) {
+                Channel ch = f1.getNow();
+                ch.writeAndFlush(object);
+                // Release back to pool
+                returnChannel(ch);
+            }
+        });
     }
 }

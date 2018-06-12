@@ -37,17 +37,14 @@ public class DubboClient {
     public DubboClient(){
         int port = Integer.valueOf(System.getProperty("dubbo.protocol.port"));
         this.connectManager = new ClientConnectManager(
-                new DubboClientInitializer(this), false
+                new DubboClientInitializer(), Provider.workerGroup, false
         ).addEndpoint(
                 new Endpoint("127.0.0.1", port)
         );
     }
 
     public void invoke(byte[] bytes, ChannelHandlerContext ctx) throws Exception {
-//        int requestId = Bytes.bytes2int(bytes, 0);
         Map<String, byte[]> pars = HTTPDecoder.decode(bytes, 4);
-
-        Channel channel = connectManager.getEndpoint().getChannelManager().getChannel();
 
         RpcInvocation invocation = new RpcInvocation();
         invocation.setMethodName(pars.get("method"));
@@ -62,21 +59,7 @@ public class DubboClient {
 //        request.setTwoWay(true);
         request.setData(invocation);
 
-//        RpcFuture future = new RpcFuture();
-//        AgentRequestHolder.put(request.getId(),future);
-//        processingRpc.put(requestId, request);
+        connectManager.getEndpoint().writeAndFlush(request);
 
-        channel.writeAndFlush(request);
-
-//        Object result = null;
-//        try {
-//            result = future.get();
-//            AgentRequestHolder.remove(request.getId());
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        } finally {
-//            pool.returnObject(request);
-//        }
-//        return result;
     }
 }

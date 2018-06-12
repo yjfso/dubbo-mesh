@@ -31,9 +31,9 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
     private boolean mutiEndpoint;
 
 
-    public ClientConnectManager(ChannelPoolHandler poolHandler, boolean mutiEndpoint){
+    public ClientConnectManager(ChannelPoolHandler poolHandler, EventLoopGroup eventLoopGroup,  boolean mutiEndpoint){
         this.mutiEndpoint = mutiEndpoint;
-        eventLoopGroup = new NioEventLoopGroup(2);
+        this.eventLoopGroup = eventLoopGroup;
         this.handler = poolHandler;
         if (mutiEndpoint){
             this.initEndpoints();

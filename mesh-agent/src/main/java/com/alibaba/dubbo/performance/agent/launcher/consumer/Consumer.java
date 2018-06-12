@@ -20,10 +20,14 @@ public class Consumer {
 
     public static Consumer INSTANCE;
 
-    ExecutorService executorService;
+//    ExecutorService executorService;
+    static EventLoopGroup bossGroup;
+    static EventLoopGroup workerGroup;
 
     private Consumer() throws Exception{
         INSTANCE = this;
+        bossGroup = new NioEventLoopGroup(2);
+        workerGroup = new NioEventLoopGroup(16);
         AgentClient.init();
         startWorkThread();
         startServer();
@@ -34,8 +38,6 @@ public class Consumer {
     }
 
     private void startServer() throws Exception{
-        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
@@ -52,7 +54,7 @@ public class Consumer {
 
     private void startWorkThread(){
         int num = Const.CONSUMER_THREAD_NUM;// + weight * 2;
-        executorService = Executors.newFixedThreadPool(num, new FastThreadFactory());
+//        executorService = Executors.newFixedThreadPool(num, new FastThreadFactory());
     }
 
 }

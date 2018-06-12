@@ -165,7 +165,7 @@ public class AgentRequest  {
 
     private void returnSelf() throws Exception{
         ctx = null;
-//        pool.returnObject(this);
+        pool.returnObject(this);
     }
 
     public boolean isKeepAlive() {

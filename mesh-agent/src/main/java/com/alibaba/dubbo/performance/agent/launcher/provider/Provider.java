@@ -24,9 +24,13 @@ public class Provider {
     static DubboClient dubboClient;
     private int weight = Integer.valueOf(System.getProperty("server.weight"));
     ExecutorService providerExecutor;
+    static EventLoopGroup bossGroup;
+    static EventLoopGroup workerGroup;
 
     private Provider() throws Exception{
         INSTANCE = this;
+        bossGroup = new NioEventLoopGroup(2);
+        workerGroup = new NioEventLoopGroup(8);
         dubboClient = new DubboClient();
         registerServer();
         startWorkThread();
@@ -37,8 +41,6 @@ public class Provider {
     }
 
     private void startServer() throws Exception{
-        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)

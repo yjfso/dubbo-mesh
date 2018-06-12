@@ -46,7 +46,6 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         // header.
         byte[] header = getNewHeader();
 
-        int savedWriteIndex = buffer.writerIndex();
         int len = 0;
         if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;
         if (req.isEvent()){

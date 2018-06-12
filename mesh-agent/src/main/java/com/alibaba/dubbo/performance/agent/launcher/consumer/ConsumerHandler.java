@@ -1,26 +1,15 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
-import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
-import com.alibaba.dubbo.performance.agent.util.objectPool.SimpleObjectPool;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 
-import io.netty.util.ReferenceCountUtil;
-import io.netty.util.concurrent.FastThreadLocal;
-import io.netty.util.concurrent.FastThreadLocalThread;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.Map;
-
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -38,27 +27,19 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        consumer.executorService.submit(()->{
+//        consumer.executorService.submit(()->{
             try{
                 if (msg instanceof FullHttpRequest) {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();
                     if (HttpMethod.POST.equals(httpMethod) ) {
-//                        ByteBuf byteBuf = req.content();
-//                        int read = byteBuf.readableBytes();
-//                        byte[] by = new byte[read];
-//                        byteBuf.readBytes(by);
-//                        String val  = new String(by);
-//                        System.out.println(val);
                         boolean keepAlive = HttpUtil.isKeepAlive(req);
-//                        Map<String, String> paramters = HttpUtils.mapPostData(req);
                         AgentRequest agentRequest = AgentRequest.getAgentRequest(); //AgentRequest.fromMap(paramters);
                         agentRequest.setByteBufHolder(req);
                         agentRequest.setCtx(ctx);
                         agentRequest.setKeepAlive(keepAlive);
-                        if (!(AgentClient.INSTANCE.invoke(agentRequest))) {
-                            agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
-                        }
+                        AgentClient.INSTANCE.invoke(agentRequest);
+//                            agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
                     }
                 }
             } catch (Exception e){
@@ -66,7 +47,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             } finally {
 //                ReferenceCountUtil.release(msg);
             }
-        });
+//        });
     }
 
     @Override
