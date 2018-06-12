@@ -13,12 +13,6 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
  */
 public class ConsumerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private Consumer consumer;
-
-    ConsumerInitializer(Consumer consumer){
-        this.consumer = consumer;
-    }
-
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
@@ -26,7 +20,7 @@ public class ConsumerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
-        pipeline.addLast(new ConsumerHandler(consumer));
+        pipeline.addLast(new ConsumerHandler());
 
     }
 }

@@ -18,17 +18,12 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger log = LoggerFactory.getLogger(ConsumerHandler.class);
 
-    private Consumer consumer;
-
-    ConsumerHandler(Consumer consumer){
-        this.consumer = consumer;
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 //        consumer.executorService.submit(()->{
             try{
+                log.info("consumer got msg");
                 if (msg instanceof FullHttpRequest) {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();

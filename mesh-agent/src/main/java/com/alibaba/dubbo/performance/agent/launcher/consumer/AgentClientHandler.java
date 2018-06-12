@@ -21,7 +21,6 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
 //        Consumer.INSTANCE.executorService.submit(
 //                ()->{
-        log.info("get provider response");
                     try{
                         byte[] bytes = (byte[]) msg;
                         int id = Bytes.bytes2int(bytes, 0);//agentResponse.getRequestId();

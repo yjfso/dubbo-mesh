@@ -51,7 +51,7 @@ public class AgentClient {
     public void invoke(AgentRequest agentRequest) throws Exception {
 
         Endpoint endpoint = connectManager.getEndpoint();
-//        logger.info("route to " + endpoint);
+        logger.info("route to " + endpoint);
 
         endpoint.writeAndFlush(agentRequest);
     }

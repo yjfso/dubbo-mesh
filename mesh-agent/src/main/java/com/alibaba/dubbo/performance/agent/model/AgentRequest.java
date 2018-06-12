@@ -8,6 +8,7 @@ import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufHolder;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,7 +47,7 @@ public class AgentRequest  {
     private ChannelHandlerContext ctx;
     private boolean keepAlive = true;
     private boolean available = true;
-    private FastThreadLocal<Integer> local = new FastThreadLocal<>();
+    private FastThreadLocal<Queue<Integer>> privateAgentRequest = new FastThreadLocal<>();
 
 
     public AgentRequest(){
@@ -190,7 +192,8 @@ public class AgentRequest  {
     }
 
     public void done(byte[] bytes) throws Exception {
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 4, bytes.length-4);
+        ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.buffer(bytes.length-4).writeBytes(bytes, 4, bytes.length-4);
+//        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 4, bytes.length-4);
         FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
         done(rep);
     }

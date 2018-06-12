@@ -13,6 +13,7 @@ public class Endpoint {
     private final String host;
     private final int port;
     int nowRequestNum = 0;
+    private final AtomicInteger totalNum = new AtomicInteger();
     private final AtomicInteger requestNum = new AtomicInteger();
     int channelNum = 8;
 
@@ -36,6 +37,7 @@ public class Endpoint {
         if (weight>0){
             nowRequestNum = requestNum.incrementAndGet();
         }
+        totalNum.getAndIncrement();
         return fixedChannelPool.acquire();
     }
 
@@ -63,7 +65,7 @@ public class Endpoint {
     }
 
     public String toString(){
-        return host + ":" + port + "|" + nowRequestNum;
+        return host + ":" + port + "|" + nowRequestNum + "|" + totalNum.get();
     }
 
     public boolean equals(Object o){
