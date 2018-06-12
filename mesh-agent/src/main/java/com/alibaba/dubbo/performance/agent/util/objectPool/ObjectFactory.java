@@ -7,6 +7,7 @@ import com.alibaba.dubbo.performance.agent.model.AgentRequest;
  */
 public interface ObjectFactory<E> {
 
-    E create() throws Exception;
+    E create(int id);
 
+    void returnObject(E e, int id);
 }

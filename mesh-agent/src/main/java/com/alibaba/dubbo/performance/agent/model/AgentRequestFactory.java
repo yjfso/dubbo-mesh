@@ -24,4 +24,11 @@ public class AgentRequestFactory extends BasePooledObjectFactory<AgentRequest>{
     public void activateObject(PooledObject<AgentRequest> p) throws Exception {
         p.getObject().initRequest();
     }
+
+
+//    @Override
+//    public void returnObject(AgentRequest agentRequest, int id){
+//        agentRequest.setId(id);
+//    }
+
 }

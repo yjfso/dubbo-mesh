@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.util.thread;
 
 import io.netty.util.concurrent.FastThreadLocalThread;
+import io.netty.util.internal.InternalThreadLocalMap;
 
 import java.util.concurrent.ThreadFactory;
 
@@ -11,6 +12,7 @@ public class FastThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        return new FastThreadLocalThread(r);
+        FastThreadLocalThread thread = new FastThreadLocalThread(r);
+        return thread;
     }
 }

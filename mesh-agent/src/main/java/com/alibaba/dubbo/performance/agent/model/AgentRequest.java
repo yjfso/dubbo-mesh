@@ -12,6 +12,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.util.concurrent.FastThreadLocal;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
@@ -44,11 +45,18 @@ public class AgentRequest  {
     private Endpoint endpoint;
     private ChannelHandlerContext ctx;
     private boolean keepAlive = true;
+    private boolean available = true;
+    private FastThreadLocal<Integer> local = new FastThreadLocal<>();
 
 
     public AgentRequest(){
         id = atomicInteger.getAndIncrement();
         requests[id] = this;
+//        setId(id);
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public AgentRequest initRequest(){
@@ -99,13 +107,9 @@ public class AgentRequest  {
 //        return parameter!=null && parameterTypesString!=null && interfaceName!=null && method!=null;
 //    }
 
-    public static AgentRequest getAgentRequest(){
-        AgentRequest agentRequest;
-        try{
-            agentRequest = pool.borrowObject();
-        } catch (Exception e){
-            agentRequest = new AgentRequest();//.initRequest();
-        }
+    public static AgentRequest getAgentRequest() throws Exception{
+        AgentRequest agentRequest=null;
+        agentRequest = pool.borrowObject();
         return agentRequest;
     }
 
@@ -170,7 +174,7 @@ public class AgentRequest  {
     private void returnSelf() throws Exception{
         endpoint = null;
         ctx = null;
-        pool.returnObject(this);
+//        pool.returnObject(this);
     }
 
     public boolean isKeepAlive() {
@@ -179,6 +183,14 @@ public class AgentRequest  {
 
     public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public void done(FullHttpResponse rep) throws Exception{
@@ -192,4 +204,6 @@ public class AgentRequest  {
         FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
         done(rep);
     }
+
+
 }

@@ -12,7 +12,7 @@ public class Const {
     public final static byte[] NULL = "null".getBytes();
     public final static byte[] VOID_JSON = "{}".getBytes();
 
-    public final static int LOAD_BALANCE_REFRESH_TIME = 3;
+    public final static int LOAD_BALANCE_REFRESH_TIME = 5;
 
     public final static int AGENT_REQUEST_NUM = 650;
     public final static int DUBBO_REQUEST_NUM = 200;

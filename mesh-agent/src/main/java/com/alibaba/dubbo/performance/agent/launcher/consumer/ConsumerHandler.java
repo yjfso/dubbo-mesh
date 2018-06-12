@@ -40,8 +40,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
         consumer.executorService.submit(()->{
             try{
-
-                System.out.println(ctx.hashCode() + "|" + ctx);
                 if (msg instanceof FullHttpRequest) {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();

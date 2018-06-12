@@ -37,8 +37,8 @@ public class Provider {
     }
 
     private void startServer() throws Exception{
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
