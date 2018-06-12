@@ -42,7 +42,6 @@ public class AgentRequest  {
 //    private String method;
 //    private String parameterTypesString;
 //    private String parameter;
-    private Endpoint endpoint;
     private ChannelHandlerContext ctx;
     private boolean keepAlive = true;
     private boolean available = true;
@@ -155,13 +154,6 @@ public class AgentRequest  {
 //        return this;
 //    }
 
-    public Endpoint getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(Endpoint endpoint) {
-        this.endpoint = endpoint;
-    }
 
     public ChannelHandlerContext getCtx() {
         return ctx;
@@ -172,7 +164,6 @@ public class AgentRequest  {
     }
 
     private void returnSelf() throws Exception{
-        endpoint = null;
         ctx = null;
 //        pool.returnObject(this);
     }
@@ -199,7 +190,6 @@ public class AgentRequest  {
     }
 
     public void done(byte[] bytes) throws Exception {
-        endpoint.response();
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 4, bytes.length-4);
         FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
         done(rep);

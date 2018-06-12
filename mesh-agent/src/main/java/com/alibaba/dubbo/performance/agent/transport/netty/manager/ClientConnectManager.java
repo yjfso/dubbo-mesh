@@ -5,6 +5,9 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.pool.AbstractChannelPoolHandler;
+import io.netty.channel.pool.ChannelPoolHandler;
+import io.netty.channel.pool.FixedChannelPool;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +23,18 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 
     private final static Logger log = LoggerFactory.getLogger(ClientConnectManager.class);
     private EventLoopGroup eventLoopGroup;
-    private ChannelHandler handler;
-    private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
+    private ChannelPoolHandler handler;
+//    private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
 
     private List<Endpoint> endpoints;
     private Endpoint activeEndpoint;
     private boolean mutiEndpoint;
 
 
-    public ClientConnectManager(ChannelHandler handler, boolean mutiEndpoint){
+    public ClientConnectManager(ChannelPoolHandler poolHandler, boolean mutiEndpoint){
         this.mutiEndpoint = mutiEndpoint;
         eventLoopGroup = new NioEventLoopGroup(2);
-        this.handler = handler;
+        this.handler = poolHandler;
         if (mutiEndpoint){
             this.initEndpoints();
         }
@@ -46,8 +49,8 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 //                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .channel(NioSocketChannel.class)
-                .handler(handler);
+                .channel(NioSocketChannel.class);
+//                .handler(handler);
     }
 
     private void initEndpoints(){
@@ -94,20 +97,24 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
         return this;
     }
 
-    public void registerChannel(Channel channel, Endpoint endpoint){
-        channelEndpointMap.put(channel, endpoint);
-    }
+//    public void registerChannel(Channel channel, Endpoint endpoint){
+//        channelEndpointMap.put(channel, endpoint);
+//    }
 
-    public void removeChannel(Channel channel) {
-        Endpoint endpoint = channelEndpointMap.get(channel);
-        if (endpoint!=null){
-            endpoint.getChannelManager().removeChannel(channel);
-            channelEndpointMap.remove(channel);
-        }
-    }
+//    public void removeChannel(Channel channel) {
+//        Endpoint endpoint = channelEndpointMap.get(channel);
+//        if (endpoint!=null){
+//            endpoint.getChannelManager().removeChannel(channel);
+//            channelEndpointMap.remove(channel);
+//        }
+//    }
 
     public Endpoint getEndpoint() throws Exception {
         return activeEndpoint;
+    }
+
+    public ChannelPoolHandler getHandler(){
+        return this.handler;
     }
 
 }

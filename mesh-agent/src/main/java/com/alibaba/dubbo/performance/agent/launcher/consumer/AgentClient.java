@@ -8,6 +8,11 @@ import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
 import io.netty.channel.Channel;
+import io.netty.channel.pool.AbstractChannelPoolHandler;
+import io.netty.channel.pool.ChannelPoolHandler;
+import io.netty.channel.pool.FixedChannelPool;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.FutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +28,7 @@ public class AgentClient {
     private static Logger logger = LoggerFactory.getLogger(DubboClient.class);
     private ConnectManager connectManager;
     public static AgentClient INSTANCE;
+    private FixedChannelPool fixedChannelPool;
 
     public static void init(){
         INSTANCE = new AgentClient();
@@ -38,21 +44,22 @@ public class AgentClient {
         } catch (Exception e){
             logger.error("consumer start error", e);
         }
+
     }
 
-    public boolean invoke(AgentRequest agentRequest) throws Exception {
+    public void invoke(AgentRequest agentRequest) throws Exception {
 
         Endpoint endpoint = connectManager.getEndpoint();
         logger.info("route to " + endpoint);
 
-        Channel channel = endpoint.getChannelManager().getChannel();
-        if (channel == null){
-            return false;
-        }
-        endpoint.request();
-        agentRequest.setEndpoint(endpoint);
-        channel.writeAndFlush(agentRequest);
-        return true;
+        endpoint.getChannelFuture().addListener((FutureListener<Channel>) f1 -> {
+            if (f1.isSuccess()) {
+                Channel ch = f1.getNow();
+                ch.writeAndFlush(agentRequest);
+                // Release back to pool
+                endpoint.returnChannel(ch);
+            }
+        });
     }
 
     public ConnectManager getConnectManager() {

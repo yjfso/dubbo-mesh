@@ -6,8 +6,7 @@ import com.alibaba.dubbo.performance.agent.util.JsonUtils;
 import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -52,28 +51,24 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;
         if (req.isEvent()){
             header[2] |= FLAG_EVENT;
+            buffer.writeBytes(header);
         } else {
             // set request id.
             Bytes.int2bytes(req.getId(), header, 8);
             // encode request data.
-            buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
 //            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] content = encodeRequestData(req.getData());
+            ByteBuf byteBuf = encodeRequestData(req.getData());
 
-            len = content.length;
-            buffer.writeBytes(content);
+            len = byteBuf.readableBytes();
+
             Bytes.int2bytes(len, header, 12);
-
+            buffer.writeBytes(header);
+            buffer.writeBytes(byteBuf);
         }
-
-        // write
-        buffer.writerIndex(savedWriteIndex);
-        buffer.writeBytes(header); // write header.
-        buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);
     }
 
 
-    public byte[] encodeRequestData(Object data) throws Exception {
+    public ByteBuf encodeRequestData(Object data) throws Exception {
         RpcInvocation inv = (RpcInvocation)data;
 
         ByteBuf byteBuf = Unpooled.buffer();
@@ -84,11 +79,8 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         writeString(byteBuf, inv.getParameterTypes());//inv.getParameterTypes());
         writeString(byteBuf, inv.getArguments());
         writeVoidJson(byteBuf);
-        int num = byteBuf.readableBytes();
-        byte[] result = new byte[num];
-        byteBuf.readBytes(result);
-        byteBuf.release();
-        return result;
+
+        return byteBuf;
 //        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
 ////        out.write();
 //

@@ -33,12 +33,11 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
                     }
                 }
         );
-
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        agentClient.getConnectManager().removeChannel(ctx.channel());
+//        agentClient.getConnectManager().removeChannel(ctx.channel());
     }
 
     @Override

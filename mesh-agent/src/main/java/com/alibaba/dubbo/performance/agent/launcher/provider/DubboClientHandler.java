@@ -45,7 +45,7 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.error("dubbo client channel inactive");
-        dubboClient.connectManager.removeChannel(ctx.channel());
+//        dubboClient.connectManager.removeChannel(ctx.channel());
     }
 
     @Override

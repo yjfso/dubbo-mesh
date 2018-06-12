@@ -34,7 +34,7 @@ public class ChannelManager {
                     .sync()
                     .channel();
             channelRing.put(channel);
-            connectManager.registerChannel(channel, endpoint);
+//            connectManager.registerChannel(channel, endpoint);
         } catch (Exception e){
             logger.error("new Channel error", e);
         }
