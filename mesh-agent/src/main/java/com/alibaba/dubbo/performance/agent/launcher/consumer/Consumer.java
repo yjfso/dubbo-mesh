@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.common.Const;
+import com.alibaba.dubbo.performance.agent.util.thread.FastThreadFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -33,8 +34,8 @@ public class Consumer {
     }
 
     private void startServer() throws Exception{
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
@@ -51,7 +52,7 @@ public class Consumer {
 
     private void startWorkThread(){
         int num = Const.CONSUMER_THREAD_NUM;// + weight * 2;
-        executorService = Executors.newFixedThreadPool(num);
+        executorService = Executors.newFixedThreadPool(num, new FastThreadFactory());
     }
 
 }

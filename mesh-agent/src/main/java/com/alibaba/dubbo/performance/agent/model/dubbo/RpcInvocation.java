@@ -26,38 +26,40 @@ public class RpcInvocation implements Serializable {
 
     private static final long serialVersionUID = -4355285085441097045L;
 
-    private String methodName;
+    private byte[] methodName;
 
-    private String parameterTypes;
+    private byte[] parameterTypes;
 
-    private String arguments;
+    private byte[] arguments;
+
+    private byte[] interfaceName;
 
     private Map<String, String> attachments;
 
     public RpcInvocation() {
     }
 
-    public String getMethodName() {
+    public byte[] getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(String methodName) {
+    public void setMethodName(byte[] methodName) {
         this.methodName = methodName;
     }
 
-    public String getParameterTypes() {
+    public byte[] getParameterTypes() {
         return parameterTypes;
     }
 
-    public void setParameterTypes(String parameterTypes) {
+    public void setParameterTypes(byte[] parameterTypes) {
         this.parameterTypes = parameterTypes;
     }
 
-    public String getArguments() {
+    public byte[] getArguments() {
         return arguments;
     }
 
-    public void setArguments(String arguments) {
+    public void setArguments(byte[] arguments) {
         this.arguments = arguments;
     }
 
@@ -88,5 +90,13 @@ public class RpcInvocation implements Serializable {
 
     public Map<String, String> getAttachments() {
         return attachments;
+    }
+
+    public byte[] getInterfaceName() {
+        return interfaceName;
+    }
+
+    public void setInterfaceName(byte[] interfaceName) {
+        this.interfaceName = interfaceName;
     }
 }

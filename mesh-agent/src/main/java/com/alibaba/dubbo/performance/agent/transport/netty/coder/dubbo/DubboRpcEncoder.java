@@ -1,11 +1,13 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo;
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.util.Bytes;
 import com.alibaba.dubbo.performance.agent.util.JsonUtils;
 import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -55,11 +57,11 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
             Bytes.int2bytes(req.getId(), header, 8);
             // encode request data.
             buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            encodeRequestData(bos, req.getData());
+//            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] content = encodeRequestData(req.getData());
 
-            len = bos.size();
-            buffer.writeBytes(bos.toByteArray());
+            len = content.length;
+            buffer.writeBytes(content);
             Bytes.int2bytes(len, header, 12);
 
         }
@@ -71,20 +73,49 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
     }
 
 
-    public void encodeRequestData(OutputStream out, Object data) throws Exception {
+    public byte[] encodeRequestData(Object data) throws Exception {
         RpcInvocation inv = (RpcInvocation)data;
 
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
-//        out.write();
+        ByteBuf byteBuf = Unpooled.buffer();
+        writeString(byteBuf, Const.DUBBO_VERSION);
+        writeString(byteBuf, inv.getInterfaceName());
+        writeNull(byteBuf);
+        writeString(byteBuf, inv.getMethodName());
+        writeString(byteBuf, inv.getParameterTypes());
+        writeString(byteBuf, inv.getArguments());
+        writeVoidJson(byteBuf);
+        int num = byteBuf.readableBytes();
+        byte[] result = new byte[num];
+        byteBuf.readBytes(result);
+        byteBuf.release();
+        return result;
+//        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
+////        out.write();
+//
+//        JsonUtils.writeObject(inv.getAttachment("dubbo", "2.0.1"), writer);
+//        JsonUtils.writeObject(inv.getInterfaceName(), writer);
+//        JsonUtils.writeObject(inv.getAttachment("version"), writer);
+//        JsonUtils.writeObject(inv.getMethodName(), writer);
+//        JsonUtils.writeObject(inv.getParameterTypes(), writer);
+//
+//        JsonUtils.writeObject(inv.getArguments(), writer);
+//        JsonUtils.writeObject(inv.getAttachments(), writer);
+    }
 
-        JsonUtils.writeObject(inv.getAttachment("dubbo", "2.0.1"), writer);
-        JsonUtils.writeObject(inv.getAttachment("path"), writer);
-        JsonUtils.writeObject(inv.getAttachment("version"), writer);
-        JsonUtils.writeObject(inv.getMethodName(), writer);
-        JsonUtils.writeObject(inv.getParameterTypes(), writer);
+    private void writeNull(ByteBuf byteBuf){
+        byteBuf.writeBytes(Const.NULL);
+        byteBuf.writeByte(Const.CR);
+    }
+    private void writeVoidJson(ByteBuf byteBuf){
+        byteBuf.writeBytes(Const.VOID_JSON);
+        byteBuf.writeByte(Const.CR);
+    }
 
-        JsonUtils.writeObject(inv.getArguments(), writer);
-        JsonUtils.writeObject(inv.getAttachments(), writer);
+    private void writeString(ByteBuf byteBuf, byte[] bytes){
+        byteBuf.writeByte(Const.QUOTA);
+        byteBuf.writeBytes(bytes);
+        byteBuf.writeByte(Const.QUOTA);
+        byteBuf.writeByte(Const.CR);
     }
 
 }

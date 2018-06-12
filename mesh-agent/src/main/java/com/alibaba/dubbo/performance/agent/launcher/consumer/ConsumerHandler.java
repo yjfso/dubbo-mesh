@@ -2,13 +2,17 @@ package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
+import com.alibaba.dubbo.performance.agent.util.objectPool.SimpleObjectPool;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.FastThreadLocal;
+import io.netty.util.concurrent.FastThreadLocalThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +40,25 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
         consumer.executorService.submit(()->{
             try{
+
+                System.out.println(ctx.hashCode() + "|" + ctx);
                 if (msg instanceof FullHttpRequest) {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();
                     if (HttpMethod.POST.equals(httpMethod) ) {
+//                        ByteBuf byteBuf = req.content();
+//                        int read = byteBuf.readableBytes();
+//                        byte[] by = new byte[read];
+//                        byteBuf.readBytes(by);
+//                        String val  = new String(by);
+//                        System.out.println(val);
                         boolean keepAlive = HttpUtil.isKeepAlive(req);
-                        Map<String, String> paramters = HttpUtils.mapPostData(req);
-                        AgentRequest agentRequest = AgentRequest.fromMap(paramters);
+//                        Map<String, String> paramters = HttpUtils.mapPostData(req);
+                        AgentRequest agentRequest = AgentRequest.getAgentRequest(); //AgentRequest.fromMap(paramters);
+                        agentRequest.setByteBufHolder(req);
                         agentRequest.setCtx(ctx);
                         agentRequest.setKeepAlive(keepAlive);
-                        if (!(agentRequest.isValid() && AgentClient.INSTANCE.invoke(agentRequest))) {
+                        if (!(AgentClient.INSTANCE.invoke(agentRequest))) {
                             agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
                         }
                     }
@@ -53,7 +66,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             } catch (Exception e){
                 log.error("consumer server catch error", e);
             } finally {
-                ReferenceCountUtil.release(msg);
+//                ReferenceCountUtil.release(msg);
             }
         });
     }

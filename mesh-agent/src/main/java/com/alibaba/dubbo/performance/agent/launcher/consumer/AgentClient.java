@@ -51,7 +51,7 @@ public class AgentClient {
         }
         endpoint.request();
         agentRequest.setEndpoint(endpoint);
-        channel.writeAndFlush(agentRequest.toBytes());
+        channel.writeAndFlush(agentRequest);
         return true;
     }
 
