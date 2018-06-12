@@ -24,7 +24,7 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
                     try{
                         byte[] bytes = (byte[]) msg;
                         int id = Bytes.bytes2int(bytes, 0);//agentResponse.getRequestId();
-                        AgentRequest agentRequest = AgentRequest.requests[id];
+                        AgentRequest agentRequest = AgentRequest.requests.get(id);//[id];
                         if(null != agentRequest){
                             agentRequest.done(bytes);
                         }

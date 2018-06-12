@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,16 +35,13 @@ public class AgentRequest  {
 
 
     private final static Logger log = LoggerFactory.getLogger(AgentRequest.class);
-    public final static ObjectPool<AgentRequest> pool =
-            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(Const.AGENT_REQUEST_NUM));
-    public final static AgentRequest[] requests = new AgentRequest[Const.AGENT_REQUEST_NUM];
+//    public final static ObjectPool<AgentRequest> pool =
+//            new GenericObjectPool<>(new AgentRequestFactory(), ObjectPoolUtils.getConfig(Const.AGENT_REQUEST_NUM));
+//    public final static AgentRequest[] requests = new AgentRequest[Const.AGENT_REQUEST_NUM];
+    public final static Map<Integer, AgentRequest> requests = new ConcurrentHashMap<>(600);
     private static AtomicInteger atomicInteger = new AtomicInteger();
     private int id;
     private ByteBufHolder byteBufHolder;
-//    private String interfaceName;
-//    private String method;
-//    private String parameterTypesString;
-//    private String parameter;
     private ChannelHandlerContext ctx;
     private boolean keepAlive = true;
     private boolean available = true;
@@ -52,7 +50,8 @@ public class AgentRequest  {
 
     public AgentRequest(){
         id = atomicInteger.getAndIncrement();
-        requests[id] = this;
+        requests.put(id, this);
+//        requests[id] = this;
 //        setId(id);
     }
 
@@ -109,8 +108,8 @@ public class AgentRequest  {
 //    }
 
     public static AgentRequest getAgentRequest() throws Exception{
-        AgentRequest agentRequest=null;
-        agentRequest = pool.borrowObject();
+        AgentRequest agentRequest = new AgentRequest();
+//        agentRequest = pool.borrowObject();
         return agentRequest;
     }
 
@@ -167,7 +166,8 @@ public class AgentRequest  {
 
     private void returnSelf() throws Exception{
         ctx = null;
-        pool.returnObject(this);
+        requests.remove(id);
+//        pool.returnObject(this);
     }
 
     public boolean isKeepAlive() {

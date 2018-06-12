@@ -15,7 +15,7 @@ public class Endpoint {
     int nowRequestNum = 0;
     private final AtomicInteger totalNum = new AtomicInteger();
     private final AtomicInteger requestNum = new AtomicInteger();
-    int channelNum = 8;
+    int channelNum = 4;
 
     int weight = 0;
     private FixedChannelPool fixedChannelPool;
