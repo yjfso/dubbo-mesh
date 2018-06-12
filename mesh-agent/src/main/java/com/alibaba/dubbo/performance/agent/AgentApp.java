@@ -15,8 +15,6 @@ public class AgentApp {
             Provider.init();
         } else{
             Consumer.init();
-//            AgentClient.init();
-//            SpringApplication.run(AgentApp.class,args);
         }
     }
 

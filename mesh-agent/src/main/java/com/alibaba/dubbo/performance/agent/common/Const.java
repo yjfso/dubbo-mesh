@@ -7,6 +7,7 @@ public class Const {
 
     public final static byte CR = 13;
     public final static byte QUOTA = 34;
+    public final static byte PERCENT = 37;
     public final static byte[] DUBBO_VERSION = "2.0.1".getBytes();
     public final static byte[] NULL = "null".getBytes();
     public final static byte[] VOID_JSON = "{}".getBytes();

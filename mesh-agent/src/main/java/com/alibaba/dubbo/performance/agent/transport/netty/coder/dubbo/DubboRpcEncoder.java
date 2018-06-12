@@ -81,7 +81,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         writeString(byteBuf, inv.getInterfaceName());
         writeNull(byteBuf);
         writeString(byteBuf, inv.getMethodName());
-        writeString(byteBuf, inv.getParameterTypes());
+        writeString(byteBuf, inv.getParameterTypes());//inv.getParameterTypes());
         writeString(byteBuf, inv.getArguments());
         writeVoidJson(byteBuf);
         int num = byteBuf.readableBytes();

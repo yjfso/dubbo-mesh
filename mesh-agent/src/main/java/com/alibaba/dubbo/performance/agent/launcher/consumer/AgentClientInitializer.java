@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
-import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentEncoder;
+import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentRequestEncoder;
 import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentDecoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -25,7 +25,7 @@ public class AgentClientInitializer extends ChannelInitializer<SocketChannel> {
 //                ;
 
         pipeline.addLast("decoder", new AgentDecoder());
-        pipeline.addLast("encoder", new AgentEncoder());
+        pipeline.addLast("encoder", new AgentRequestEncoder());
         pipeline.addLast(new AgentClientHandler(agentClient));
     }
 }

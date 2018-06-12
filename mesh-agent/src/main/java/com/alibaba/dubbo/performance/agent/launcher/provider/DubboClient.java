@@ -45,7 +45,6 @@ public class DubboClient {
 
     public void invoke(byte[] bytes, ChannelHandlerContext ctx) throws Exception {
 //        int requestId = Bytes.bytes2int(bytes, 0);
-        new String(bytes, 4, bytes.length-4);
         Map<String, byte[]> pars = HTTPDecoder.decode(bytes, 4);
 
         Channel channel = connectManager.getEndpoint().getChannelManager().getChannel();

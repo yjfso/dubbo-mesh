@@ -1,7 +1,8 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentDecoder;
-import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentEncoder;
+import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentRequestEncoder;
+import com.alibaba.dubbo.performance.agent.transport.netty.coder.agent.AgentResponseEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -23,7 +24,7 @@ public class ProviderInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new AgentDecoder());
-        pipeline.addLast("encoder", new AgentEncoder());
+        pipeline.addLast("encoder", new AgentResponseEncoder());
         pipeline.addLast(new ProviderHandler(provider));
 
     }
