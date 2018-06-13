@@ -1,13 +1,10 @@
 package com.alibaba.dubbo.performance.agent.util.objectPool;
 
-import com.alibaba.dubbo.performance.agent.model.AgentRequest;
-import com.alibaba.dubbo.performance.agent.model.AgentRequestFactory;
-import org.apache.commons.pool2.BasePooledObjectFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.IntStream;
+
 
 /**
  * Created by yinjianfeng on 18/6/11.
@@ -17,10 +14,9 @@ public class SimpleObjectPool<E extends PoolObject> {
     private E[] es;
     private int activeNum;
     private int totalNum;
-    int[] availableIds;
-    int fetchIndex = 0;
-//    private LoopNum borrowNum = new LoopNum(activeNum, totalNum);
-//    private LoopNum returnNum = new LoopNum(activeNum, totalNum);
+    private int[] availableIds;
+    private int fetchIndex = 0;
+
     private ObjectFactory<E> objectFactory;
 
     public SimpleObjectPool(int activeNum, ObjectFactory<E> objectFactory) throws Exception{

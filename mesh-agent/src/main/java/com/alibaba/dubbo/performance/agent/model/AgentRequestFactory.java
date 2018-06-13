@@ -1,10 +1,7 @@
 package com.alibaba.dubbo.performance.agent.model;
 
 import com.alibaba.dubbo.performance.agent.util.objectPool.ObjectFactory;
-import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.PooledObject;
-import org.apache.commons.pool2.impl.DefaultPooledObject;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 
 /**
  * Created by yinjianfeng on 18/6/3.
