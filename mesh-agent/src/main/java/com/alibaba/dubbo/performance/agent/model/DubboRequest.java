@@ -74,4 +74,7 @@ public class DubboRequest extends AbstractRequest {
         returnSelf();
     }
 
+    public byte[] getAgentRequest() {
+        return agentRequest;
+    }
 }

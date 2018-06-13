@@ -107,8 +107,7 @@ public class Endpoint {
         return this;
     }
 
-    public void writeAndFlush(ChannelHandlerContext ctx, Object object){
-        ChannelFuture channelFuture = getChannelFuture(ctx);
+    public static void writeAndFlush(ChannelFuture channelFuture, Object object){
         if(channelFuture.isDone()){
             channelFuture.channel().writeAndFlush(object);
         } else{

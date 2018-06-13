@@ -7,6 +7,7 @@ import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ public class DubboClient {
         );
     }
 
-    public void invoke(byte[] bytes, ChannelHandlerContext ctx) throws Exception {
+    public void invoke(DubboRequest dubboRequest, ChannelFuture channelFuture) throws Exception {
+        byte[] bytes = dubboRequest.getAgentRequest();
         Map<String, byte[]> pars = HTTPDecoder.decode(bytes, 4);
 
         RpcInvocation invocation = new RpcInvocation();
@@ -38,13 +40,13 @@ public class DubboClient {
         invocation.setParameterTypes(pars.get("parameterTypesString"));    // Dubbo内部用"Ljava/lang/String"来表示参数类型是String
         invocation.setArguments(pars.get("parameter"));
 
-        DubboRequest dubboRequest = DubboRequest.getDubboRequest();
-        dubboRequest.setAgentRequest(bytes);
-        dubboRequest.setCtx(ctx);
-
         dubboRequest.setData(invocation);
 
-        connectManager.getEndpoint().writeAndFlush(ctx, dubboRequest);
+        Endpoint.writeAndFlush(channelFuture, dubboRequest);
 
+    }
+
+    public ConnectManager getConnectManager() {
+        return connectManager;
     }
 }

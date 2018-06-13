@@ -22,6 +22,9 @@ public class AgentDecoder extends ByteToMessageDecoder {
                     byteBuf.markReaderIndex();
                     int readable = byteBuf.readableBytes();
                     if (readable < 4) {
+                        byte[] b=  new byte[readable];
+                        byteBuf.readBytes(b);
+                        System.out.println(b);
                         byteBuf.resetReaderIndex();
                         break;
                     }

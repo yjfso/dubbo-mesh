@@ -15,7 +15,7 @@ public class AgentClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = socketChannel.pipeline();
 
         pipeline.addLast("decoder", new AgentDecoder());
-        pipeline.addLast("encoder", new AgentRequestEncoder());
+//        pipeline.addLast("encoder", new AgentRequestEncoder());
         pipeline.addLast(new AgentClientHandler());
     }
 }
