@@ -39,6 +39,7 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         log.info("dubbo client userEventTriggered");
         if (evt instanceof IdleStateEvent) {
+            System.out.println("sent heartbeat in userEventTriggered");
             DubboRequest dubboRequest = new DubboRequest();
             dubboRequest.setTwoWay(false);
             dubboRequest.setEvent(true);

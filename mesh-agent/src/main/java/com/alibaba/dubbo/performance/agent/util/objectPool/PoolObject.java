@@ -12,4 +12,5 @@ public interface PoolObject {
     boolean isAvailable();
 
     void setAvailable(boolean available);
+
 }

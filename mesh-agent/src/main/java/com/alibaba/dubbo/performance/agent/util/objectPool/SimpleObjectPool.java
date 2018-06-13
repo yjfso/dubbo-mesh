@@ -54,17 +54,14 @@ public class SimpleObjectPool<E extends PoolObject> {
                 availableIds[nowIndex++] = i;
             }
         }
-        if (nowIndex + 1 < totalNum){
+        if (nowIndex < totalNum){
             availableIds[nowIndex] = -1;
         }
         return hasGc;
     }
 
     public int fetchNextId() throws Exception{
-        if (fetchIndex >= totalNum){
-            fetchIndex = 0;
-        }
-        if (availableIds[fetchIndex]!=-1 && fetchIndex<totalNum){
+        if (fetchIndex<totalNum && availableIds[fetchIndex]!=-1){
             return availableIds[fetchIndex++];
         }
         if(gc()){

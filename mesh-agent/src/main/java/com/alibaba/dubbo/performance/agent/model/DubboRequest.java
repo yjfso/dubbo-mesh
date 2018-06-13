@@ -2,17 +2,13 @@ package com.alibaba.dubbo.performance.agent.model;
 
 
 import com.alibaba.dubbo.performance.agent.common.Const;
-import com.alibaba.dubbo.performance.agent.model.dubbo.RequestFactory;
-import com.alibaba.dubbo.performance.agent.util.ObjectPoolUtils;
 import com.alibaba.dubbo.performance.agent.util.objectPool.SimpleObjectPool;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.FastThreadLocal;
-import org.apache.commons.pool2.ObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DubboRequest extends AbstractRequest {
 
@@ -22,14 +18,14 @@ public class DubboRequest extends AbstractRequest {
     private boolean event = false;
     private Object mData;
 
-    private static FastThreadLocal<SimpleObjectPool<DubboRequest>> privateAgentRequest = new FastThreadLocal<>();
+    private static FastThreadLocal<SimpleObjectPool<DubboRequest>> privateDubboRequest = new FastThreadLocal<>();
 
 
     public static SimpleObjectPool<DubboRequest> getPool() throws Exception{
-        SimpleObjectPool<DubboRequest> pool = privateAgentRequest.get();
+        SimpleObjectPool<DubboRequest> pool = privateDubboRequest.get();
         if (pool == null){
-            pool = new SimpleObjectPool<>(Const.AGENT_REQUEST_NUM, new DubboRequestFactory());
-            privateAgentRequest.set(pool);
+            pool = new SimpleObjectPool<>(Const.DUBBO_REQUEST_NUM, new DubboRequestFactory());
+            privateDubboRequest.set(pool);
         }
         return pool;
     }

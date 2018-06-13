@@ -28,4 +28,5 @@ public abstract class AbstractRequest extends AbstractPoolObject {
     public void setEndpoint(Endpoint endpoint){
         this.endpoint = endpoint;
     }
+
 }
