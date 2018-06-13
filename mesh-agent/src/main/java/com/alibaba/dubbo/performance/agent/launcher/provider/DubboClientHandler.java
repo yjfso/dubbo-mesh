@@ -18,9 +18,16 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] response) {
         try{
             int requestId = Bytes.bytes2int(response, 0);
-            DubboRequest dubboRequest = DubboRequest.getPool().get(requestId);
-            if(null != dubboRequest){
-                dubboRequest.done(response);
+            if (requestId==-1){
+                DubboRequest dubboRequest = new DubboRequest();
+                dubboRequest.setTwoWay(false);
+                dubboRequest.setEvent(true);
+                channelHandlerContext.writeAndFlush(dubboRequest);
+            } else {
+                DubboRequest dubboRequest = DubboRequest.getPool().get(requestId);
+                if(null != dubboRequest){
+                    dubboRequest.done(response);
+                }
             }
         }
         catch (Exception e){

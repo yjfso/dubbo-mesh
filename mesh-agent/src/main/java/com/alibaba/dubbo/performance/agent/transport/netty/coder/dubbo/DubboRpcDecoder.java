@@ -13,6 +13,8 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
     protected static final int HEADER_LENGTH = 16;
 
     protected static final byte FLAG_EVENT = (byte) 0x20;
+    protected static final byte[] EVENT_RESPONSE = new byte[]{-1, -1, -1, -1};
+
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
@@ -62,13 +64,19 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
             return DecodeResult.NEED_MORE_INPUT;
         }
 
+        if ((header[2] & FLAG_EVENT) == 32){
+            int readerIndex = byteBuf.readerIndex();
+            byteBuf.readerIndex(readerIndex + len);
+            return EVENT_RESPONSE;
+        }
+
         byte[] response = new byte[4 + len - 3];
         System.arraycopy(header, 8, response, 0, 4);
         int readerIndex = byteBuf.readerIndex();
         byteBuf.readerIndex(readerIndex + 2);
         byteBuf.readBytes(response, 4, len - 3);
         byteBuf.readerIndex(readerIndex + len);
-
         return response;
     }
+
 }

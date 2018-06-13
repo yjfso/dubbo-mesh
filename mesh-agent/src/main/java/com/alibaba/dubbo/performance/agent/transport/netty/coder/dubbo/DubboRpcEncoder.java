@@ -71,18 +71,14 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         writeString(byteBuf, inv.getArguments());
         writeVoidJson(byteBuf);
 
+//        int index = byteBuf.readerIndex();
+//        int reaaAble = byteBuf.readableBytes();
+//        byte[] result = new byte[reaaAble];
+//        byteBuf.readBytes(result);
+//        System.out.println(new String(result).replaceAll("(\\r\\n|\\r|\\n|\\n\\r)", ""));
+//        byteBuf.readerIndex(index);
+
         return byteBuf;
-//        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
-////        out.write();
-//
-//        JsonUtils.writeObject(inv.getAttachment("dubbo", "2.0.1"), writer);
-//        JsonUtils.writeObject(inv.getInterfaceName(), writer);
-//        JsonUtils.writeObject(inv.getAttachment("version"), writer);
-//        JsonUtils.writeObject(inv.getMethodName(), writer);
-//        JsonUtils.writeObject(inv.getParameterTypes(), writer);
-//
-//        JsonUtils.writeObject(inv.getArguments(), writer);
-//        JsonUtils.writeObject(inv.getAttachments(), writer);
     }
 
     private void writeNull(ByteBuf byteBuf){

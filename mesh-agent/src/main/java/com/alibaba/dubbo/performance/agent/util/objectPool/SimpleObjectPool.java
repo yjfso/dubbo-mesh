@@ -45,6 +45,7 @@ public class SimpleObjectPool<E extends PoolObject> {
     }
 
     private boolean gc(){
+        fetchIndex = 0;
         boolean hasGc = false;
         int nowIndex = 0;
         for (int i = 0; i < totalNum; i++) {
@@ -60,11 +61,14 @@ public class SimpleObjectPool<E extends PoolObject> {
     }
 
     public int fetchNextId() throws Exception{
+        if (fetchIndex >= totalNum){
+            fetchIndex = 0;
+        }
         if (availableIds[fetchIndex]!=-1 && fetchIndex<totalNum){
             return availableIds[fetchIndex++];
         }
         if(gc()){
-            return fetchNextId();
+            return availableIds[fetchIndex++];
         }
         throw new Exception("lack object");
     }
