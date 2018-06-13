@@ -3,12 +3,14 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 
 import com.alibaba.dubbo.performance.agent.util.Bytes;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ChannelHandler.Sharable
 public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
 
 

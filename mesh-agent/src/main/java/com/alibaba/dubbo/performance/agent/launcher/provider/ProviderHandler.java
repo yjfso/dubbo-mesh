@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by yinjianfeng on 18/5/27.
  */
+@ChannelHandler.Sharable
 public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
     private Provider provider;
