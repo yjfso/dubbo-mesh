@@ -1,16 +1,11 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
-import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.launcher.provider.DubboClient;
 import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
-import io.netty.channel.Channel;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.pool.AbstractChannelPoolHandler;
-import io.netty.channel.pool.ChannelPoolHandler;
 import io.netty.channel.pool.FixedChannelPool;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
