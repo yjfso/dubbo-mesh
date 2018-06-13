@@ -4,10 +4,6 @@ import com.alibaba.dubbo.performance.agent.common.Const;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.pool.AbstractChannelPoolHandler;
-import io.netty.channel.pool.ChannelPoolHandler;
-import io.netty.channel.pool.FixedChannelPool;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +11,11 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 public class ClientConnectManager extends AbstractConnectManager implements ConnectManager {
 
     private final static Logger log = LoggerFactory.getLogger(ClientConnectManager.class);
-//    private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
 
     private ChannelInitializer channelInitializer;
     private List<Endpoint> endpoints;
