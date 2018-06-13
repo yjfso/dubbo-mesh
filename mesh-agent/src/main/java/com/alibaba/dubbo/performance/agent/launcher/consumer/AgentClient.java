@@ -38,7 +38,7 @@ public class AgentClient {
     public AgentClient()  {
         try{
             this.connectManager = new ClientConnectManager(
-                    new AgentClientInitializer(this), new NioEventLoopGroup(4), true
+                    new AgentClientInitializer(this), Consumer.workerGroup, true
             );
             new EtcdRegistry(System.getProperty("etcd.url"))
                     .watch("com.alibaba.dubbo.performance.demo.provider.IHelloService", connectManager);
@@ -53,7 +53,7 @@ public class AgentClient {
         Endpoint endpoint = connectManager.getEndpoint();
         logger.info("route to " + endpoint);
 
-        endpoint.writeAndFlush(agentRequest);
+        endpoint.getChannel(agentRequest.getCtx()).writeAndFlush(agentRequest);
     }
 
     public ConnectManager getConnectManager() {

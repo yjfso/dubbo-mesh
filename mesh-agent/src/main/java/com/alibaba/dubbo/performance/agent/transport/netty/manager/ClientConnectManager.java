@@ -43,7 +43,7 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 
     public void initBootstrap() {
         bootstrap = new Bootstrap()
-                .group(eventLoopGroup)
+                .group(eventLoopGroup.next())
                 .option(ChannelOption.SO_KEEPALIVE, true)
 //                .option(ChannelOption.TCP_NODELAY, false)
 //                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)

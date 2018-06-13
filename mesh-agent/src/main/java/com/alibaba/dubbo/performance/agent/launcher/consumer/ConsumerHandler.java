@@ -7,8 +7,12 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 
 
+import io.netty.util.concurrent.ThreadPerTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 
 /**
@@ -33,8 +37,12 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                         agentRequest.setByteBufHolder(req);
                         agentRequest.setCtx(ctx);
                         agentRequest.setKeepAlive(keepAlive);
-                        AgentClient.INSTANCE.invoke(agentRequest);
-//                            agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
+                        try{
+                            AgentClient.INSTANCE.invoke(agentRequest);
+                        } catch (Exception e){
+                            agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
+                            log.error("agentClient invoke error", e);
+                        }
                     }
                 }
             } catch (Exception e){
