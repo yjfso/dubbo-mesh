@@ -1,19 +1,12 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo;
 
 import com.alibaba.dubbo.performance.agent.common.Const;
+import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 import com.alibaba.dubbo.performance.agent.util.Bytes;
-import com.alibaba.dubbo.performance.agent.util.JsonUtils;
-import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
-import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 
 public class DubboRpcEncoder extends MessageToByteEncoder{
 
@@ -41,7 +34,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf buffer) throws Exception {
-        Request req = (Request)msg;
+        DubboRequest req = (DubboRequest)msg;
 
         // header.
         byte[] header = getNewHeader();
@@ -54,8 +47,7 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
         } else {
             // set request id.
             Bytes.int2bytes(req.getId(), header, 8);
-            // encode request data.
-//            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
             ByteBuf byteBuf = encodeRequestData(req.getData());
 
             len = byteBuf.readableBytes();

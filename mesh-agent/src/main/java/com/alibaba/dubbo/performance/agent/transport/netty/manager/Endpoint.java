@@ -1,9 +1,6 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.manager;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.EventLoop;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoop;
 import io.netty.channel.pool.ChannelPoolHandler;
 import io.netty.channel.pool.FixedChannelPool;
@@ -26,11 +23,11 @@ public class Endpoint {
     private final AtomicInteger totalNum = new AtomicInteger();
     private final AtomicInteger requestNum = new AtomicInteger();
     int channelNum = 4;
-    private FastThreadLocal<Channel> threadChannel = new FastThreadLocal<>();
+    private FastThreadLocal<ChannelFuture> threadChannel = new FastThreadLocal<>();
     private ConnectManager connectManager;
 
     int weight = 0;
-    private FixedChannelPool fixedChannelPool;
+//    private FixedChannelPool fixedChannelPool;
 
     public Endpoint(String host,int port){
         this.host = host;
@@ -38,7 +35,7 @@ public class Endpoint {
     }
 
     void initChannelManager(ConnectManager connectManager){
-//        this.connectManager = connectManager;
+        this.connectManager = connectManager;
 //        connectManager.getBootstrap().clone().group()
 //        fixedChannelPool = new FixedChannelPool(
 //                connectManager.getBootstrap().remoteAddress(getInetSocketAddress()),
@@ -47,18 +44,18 @@ public class Endpoint {
 //        );
     }
 
-    public Channel getChannel(ChannelHandlerContext ctx){
+    public ChannelFuture getChannelFuture(ChannelHandlerContext ctx){
         if (weight>0){
             nowRequestNum = requestNum.incrementAndGet();
         }
         totalNum.getAndIncrement();
         if(threadChannel.get()==null){
             try{
-                Channel channel = connectManager.getBootstrap().clone()
-                        .group(ctx.channel().eventLoop()).connect(getInetSocketAddress())
-                        .sync()
-                        .channel();
-                threadChannel.set(channel);
+                ChannelFuture future = connectManager.getBootstrap().clone()
+                        .group(ctx.channel().eventLoop()).connect(getInetSocketAddress());
+//                        .sync()
+//                        .channel();
+                threadChannel.set(future);
             } catch (Exception e){
                 log.error("create channel error", e);
             }
@@ -66,11 +63,11 @@ public class Endpoint {
         return threadChannel.get();
     }
 
-    public void returnChannel(Channel channel){
+    public void returnChannel(){
         if (weight>0){
             nowRequestNum = requestNum.decrementAndGet();
         }
-        fixedChannelPool.release(channel);
+//        fixedChannelPool.release(channel);
     }
 
     public Integer getRequestNum(){
@@ -109,15 +106,21 @@ public class Endpoint {
         this.weight = weight;
         return this;
     }
-//
-//    public void writeAndFlush(ChannelHandlerContext ctx, Object object){
-//        getChannelFuture().addListener((FutureListener<Channel>) f1 -> {
-//            if (f1.isSuccess()) {
-//                Channel ch = f1.getNow();
-//                ch.writeAndFlush(object);
-//                // Release back to pool
-//                returnChannel(ch);
-//            }
-//        });
-//    }
+
+    public void writeAndFlush(ChannelHandlerContext ctx, Object object){
+        ChannelFuture channelFuture = getChannelFuture(ctx);
+        if(channelFuture.isDone()){
+            channelFuture.channel().writeAndFlush(object);
+        } else{
+            channelFuture.addListener(
+                    new ChannelFutureListener(){
+                        @Override
+                        public void operationComplete(ChannelFuture cf) throws Exception {
+                            cf.channel().writeAndFlush(object);
+                            channelFuture.removeListener(this);
+                        }
+                    }
+            );
+        }
+    }
 }

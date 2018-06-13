@@ -9,5 +9,7 @@ public interface ObjectFactory<E> {
 
     E create(int id);
 
+    E[] createList(int num);
+
     void returnObject(E e, int id);
 }

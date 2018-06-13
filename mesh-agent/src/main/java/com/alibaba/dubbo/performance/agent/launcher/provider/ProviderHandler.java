@@ -23,15 +23,12 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        provider.providerExecutor.submit(()->{
-            try{
-                byte[] bytes = (byte[]) msg;
-                Provider.dubboClient.invoke(bytes, ctx);
-
-            } catch (Exception e){
-                log.error("provider handler error", e);
-            }
-        });
+        try{
+            byte[] bytes = (byte[]) msg;
+            Provider.dubboClient.invoke(bytes, ctx);
+        } catch (Exception e){
+            log.error("provider handler error", e);
+        }
 
     }
 
@@ -42,8 +39,4 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-//    @Override
-//    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-//        ctx.flush();
-//    }
 }

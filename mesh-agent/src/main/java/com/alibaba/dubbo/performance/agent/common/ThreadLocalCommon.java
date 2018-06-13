@@ -9,5 +9,5 @@ import io.netty.util.concurrent.FastThreadLocal;
 public class ThreadLocalCommon {
 
 
-    public final static FastThreadLocal<EventLoop>
+
 }

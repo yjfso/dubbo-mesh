@@ -11,28 +11,20 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger log = LoggerFactory.getLogger(AgentClientHandler.class);
 
-    private AgentClient agentClient;
-    public AgentClientHandler(AgentClient agentClient){
-        this.agentClient = agentClient;
-    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-//        Consumer.INSTANCE.executorService.submit(
-//                ()->{
-                    try{
-                        byte[] bytes = (byte[]) msg;
-                        int id = Bytes.bytes2int(bytes, 0);//agentResponse.getRequestId();
-                        AgentRequest agentRequest = AgentRequest.requests.get(id);//[id];
-                        if(null != agentRequest){
-                            agentRequest.done(bytes);
-                        }
-                    } catch (Exception e){
-                        log.error("consumer client response error", e);
-                    }
-//                }
-//        );
+        try{
+            byte[] bytes = (byte[]) msg;
+            int id = Bytes.bytes2int(bytes, 0);//agentResponse.getRequestId();
+            AgentRequest agentRequest = AgentRequest.getPool().get(id);//[id];
+            if(null != agentRequest){
+                agentRequest.done(bytes);
+            }
+        } catch (Exception e){
+            log.error("consumer client response error", e);
+        }
     }
 
     @Override

@@ -14,12 +14,14 @@ public class Const {
 
     public final static int LOAD_BALANCE_REFRESH_TIME = 5;
 
-    public final static int AGENT_REQUEST_NUM = 650;
+    public final static int AGENT_REQUEST_NUM = 10;
     public final static int DUBBO_REQUEST_NUM = 200;
 
     public final static int MAX_DUBBO_REQUEST = 210;
     public final static int CONSUMER_THREAD_NUM = 600;
-    public final static int CONSUMER_SER_BOSS = 1;
-    public final static int CONSUMER_SER_WORKER = 16;
+    public final static int CONSUMER_SER_BOSS = 4;
+    public final static int CONSUMER_SER_WORKER = 500;
+    public final static int PROVIDER_SER_BOSS = 4;
+    public final static int PROVIDER_SER_WORKER = 210;
 
 }

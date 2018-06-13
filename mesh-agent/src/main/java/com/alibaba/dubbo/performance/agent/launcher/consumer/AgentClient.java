@@ -38,7 +38,7 @@ public class AgentClient {
     public AgentClient()  {
         try{
             this.connectManager = new ClientConnectManager(
-                    new AgentClientInitializer(this), Consumer.workerGroup, true
+                    new AgentClientInitializer(), true
             );
             new EtcdRegistry(System.getProperty("etcd.url"))
                     .watch("com.alibaba.dubbo.performance.demo.provider.IHelloService", connectManager);
@@ -51,9 +51,13 @@ public class AgentClient {
     public void invoke(AgentRequest agentRequest) throws Exception {
 
         Endpoint endpoint = connectManager.getEndpoint();
+        if (endpoint==null){
+            throw new Exception("lack endpoint");
+        }
         logger.info("route to " + endpoint);
+        agentRequest.setEndpoint(endpoint);
 
-        endpoint.getChannel(agentRequest.getCtx()).writeAndFlush(agentRequest);
+        endpoint.writeAndFlush(agentRequest.getCtx(), agentRequest);
     }
 
     public ConnectManager getConnectManager() {

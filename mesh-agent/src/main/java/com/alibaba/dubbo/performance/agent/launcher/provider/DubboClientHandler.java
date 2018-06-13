@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
-import com.alibaba.dubbo.performance.agent.model.dubbo.Request;
+import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 
 import com.alibaba.dubbo.performance.agent.util.Bytes;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,25 +16,26 @@ public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] response) {
-        Provider.INSTANCE.providerExecutor.submit(
-                ()->{
-                    int requestId = Bytes.bytes2int(response, 0);
-                    Request request = Request.requests[requestId];
-                    if(null != request){
-                        request.done(response);
-                    }
-                }
-        );
+        try{
+            int requestId = Bytes.bytes2int(response, 0);
+            DubboRequest dubboRequest = DubboRequest.getPool().get(requestId);
+            if(null != dubboRequest){
+                dubboRequest.done(response);
+            }
+        }
+        catch (Exception e){
+            log.error("dubbo read error", e);
+        }
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         log.info("dubbo client userEventTriggered");
         if (evt instanceof IdleStateEvent) {
-            Request request = new Request().init();
-            request.setTwoWay(false);
-            request.setEvent(true);
-            ctx.writeAndFlush(request);
+            DubboRequest dubboRequest = new DubboRequest();
+            dubboRequest.setTwoWay(false);
+            dubboRequest.setEvent(true);
+            ctx.writeAndFlush(dubboRequest);
         }
     }
 

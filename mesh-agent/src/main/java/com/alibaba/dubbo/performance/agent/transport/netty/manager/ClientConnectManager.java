@@ -22,19 +22,17 @@ import java.util.concurrent.Executors;
 public class ClientConnectManager extends AbstractConnectManager implements ConnectManager {
 
     private final static Logger log = LoggerFactory.getLogger(ClientConnectManager.class);
-    private EventLoopGroup eventLoopGroup;
-    private ChannelPoolHandler handler;
 //    private Map<Channel, Endpoint> channelEndpointMap = new ConcurrentHashMap<>();
 
+    private ChannelInitializer channelInitializer;
     private List<Endpoint> endpoints;
     private Endpoint activeEndpoint;
     private boolean mutiEndpoint;
 
 
-    public ClientConnectManager(ChannelPoolHandler poolHandler, EventLoopGroup eventLoopGroup,  boolean mutiEndpoint){
+    public ClientConnectManager(ChannelInitializer channelInitializer, boolean mutiEndpoint){
         this.mutiEndpoint = mutiEndpoint;
-        this.eventLoopGroup = eventLoopGroup;
-        this.handler = poolHandler;
+        this.channelInitializer = channelInitializer;
         if (mutiEndpoint){
             this.initEndpoints();
         }
@@ -43,14 +41,14 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 
     public void initBootstrap() {
         bootstrap = new Bootstrap()
-                .group(eventLoopGroup.next())
+//                .group(eventLoopGroup.next())
                 .option(ChannelOption.SO_KEEPALIVE, true)
 //                .option(ChannelOption.TCP_NODELAY, false)
 //                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .channel(NioSocketChannel.class);
-//                .handler(handler);
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer);
     }
 
     private void initEndpoints(){
@@ -111,10 +109,6 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 
     public Endpoint getEndpoint() throws Exception {
         return activeEndpoint;
-    }
-
-    public ChannelPoolHandler getHandler(){
-        return this.handler;
     }
 
 }

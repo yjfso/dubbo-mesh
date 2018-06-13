@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.model;
 
+import com.alibaba.dubbo.performance.agent.util.objectPool.ObjectFactory;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
@@ -8,27 +9,23 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 /**
  * Created by yinjianfeng on 18/6/3.
  */
-public class AgentRequestFactory extends BasePooledObjectFactory<AgentRequest>{
-
-
-    @Override
-    public AgentRequest create() throws Exception {
-        return new AgentRequest();
-    }
+public class AgentRequestFactory implements ObjectFactory<AgentRequest> {
 
     @Override
-    public PooledObject<AgentRequest> wrap(AgentRequest agentRequest) {
-        return new DefaultPooledObject<>(agentRequest);
+    public AgentRequest create(int id) {
+        AgentRequest agentRequest = new AgentRequest();
+        agentRequest.setId(id);
+        return agentRequest;
     }
 
-    public void activateObject(PooledObject<AgentRequest> p) throws Exception {
-        p.getObject().initRequest();
+    @Override
+    public AgentRequest[] createList(int num) {
+        return new AgentRequest[num];
     }
 
+    @Override
+    public void returnObject(AgentRequest agentRequest, int id) {
 
-//    @Override
-//    public void returnObject(AgentRequest agentRequest, int id){
-//        agentRequest.setId(id);
-//    }
+    }
 
 }

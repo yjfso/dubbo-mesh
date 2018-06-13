@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.provider;
 
+import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.agent.registry.IRegistry;
 import io.netty.bootstrap.ServerBootstrap;
@@ -23,17 +24,17 @@ public class Provider {
 
     static DubboClient dubboClient;
     private int weight = Integer.valueOf(System.getProperty("server.weight"));
-    ExecutorService providerExecutor;
-    static EventLoopGroup bossGroup;
-    static EventLoopGroup workerGroup;
+//    private ExecutorService providerExecutor;
+    private static EventLoopGroup bossGroup;
+    private static EventLoopGroup workerGroup;
 
     private Provider() throws Exception{
         INSTANCE = this;
-        bossGroup = new NioEventLoopGroup(2);
-        workerGroup = new NioEventLoopGroup(8);
+        bossGroup = new NioEventLoopGroup(Const.PROVIDER_SER_BOSS);
+        workerGroup = new NioEventLoopGroup(Const.PROVIDER_SER_WORKER);
         dubboClient = new DubboClient();
         registerServer();
-        startWorkThread();
+//        startWorkThread();
         startServer();
     }
     public static void init() throws Exception{
@@ -57,10 +58,10 @@ public class Provider {
         }
     }
 
-    private void startWorkThread(){
-        int num = 210;
-        providerExecutor = Executors.newFixedThreadPool(num);
-    }
+//    private void startWorkThread(){
+//        int num = 210;
+//        providerExecutor = Executors.newFixedThreadPool(num);
+//    }
 
     private void registerServer(){
         IRegistry etcdRegistry = new EtcdRegistry(System.getProperty("etcd.url"));

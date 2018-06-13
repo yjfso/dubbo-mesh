@@ -12,23 +12,14 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.pool.ChannelPoolHandler;
 import io.netty.channel.socket.SocketChannel;
 
-public class DubboClientInitializer implements ChannelPoolHandler {
+public class DubboClientInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
-    public void channelReleased(Channel channel) throws Exception {
-
-    }
-
-    @Override
-    public void channelAcquired(Channel channel) throws Exception {
-
-    }
-
-    @Override
-    public void channelCreated(Channel channel) throws Exception {
-        ChannelPipeline pipeline = channel.pipeline();
+    protected void initChannel(SocketChannel socketChannel) {
+        ChannelPipeline pipeline = socketChannel.pipeline();
         pipeline.addLast(new DubboRpcEncoder());
         pipeline.addLast(new DubboRpcDecoder());
         pipeline.addLast(new DubboClientHandler());
     }
 }
+

@@ -19,5 +19,4 @@ public interface ConnectManager {
 
     ConnectManager removeEndpoint(Endpoint endpoint);
 
-    ChannelPoolHandler getHandler();
 }

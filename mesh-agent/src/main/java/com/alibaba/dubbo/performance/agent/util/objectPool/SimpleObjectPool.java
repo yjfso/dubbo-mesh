@@ -12,15 +12,22 @@ import java.util.stream.IntStream;
 /**
  * Created by yinjianfeng on 18/6/11.
  */
-public class SimpleObjectPool<E> {
+public class SimpleObjectPool<E extends PoolObject> {
 
     private E[] es;
     private int activeNum;
     private int totalNum;
-    private LoopNum borrowNum = new LoopNum(activeNum, totalNum);
-    private LoopNum returnNum = new LoopNum(activeNum, totalNum);
+    int[] availableIds;
+    int fetchIndex = 0;
+//    private LoopNum borrowNum = new LoopNum(activeNum, totalNum);
+//    private LoopNum returnNum = new LoopNum(activeNum, totalNum);
     private ObjectFactory<E> objectFactory;
 
+    public SimpleObjectPool(int activeNum, ObjectFactory<E> objectFactory) throws Exception{
+        this.totalNum = activeNum;
+        this.objectFactory = objectFactory;
+        this.init();
+    }
     public SimpleObjectPool(int activeNum, int bufferNum, ObjectFactory<E> objectFactory) throws Exception{
         this.activeNum = activeNum;
         this.totalNum = bufferNum + activeNum;
@@ -29,10 +36,37 @@ public class SimpleObjectPool<E> {
     }
 
     private void init() throws Exception{
-        es = (E[])new Object[totalNum];
+        availableIds = new int[totalNum];
+        es = objectFactory.createList(totalNum);
         for(int i=0; i<totalNum; i++){
+            availableIds[i] = i;
             es[i] = objectFactory.create(i);
         }
+    }
+
+    private boolean gc(){
+        boolean hasGc = false;
+        int nowIndex = 0;
+        for (int i = 0; i < totalNum; i++) {
+            if(es[i].isAvailable()){
+                hasGc = true;
+                availableIds[nowIndex++] = i;
+            }
+        }
+        if (nowIndex + 1 < totalNum){
+            availableIds[nowIndex] = -1;
+        }
+        return hasGc;
+    }
+
+    public int fetchNextId() throws Exception{
+        if (availableIds[fetchIndex]!=-1 && fetchIndex<totalNum){
+            return availableIds[fetchIndex++];
+        }
+        if(gc()){
+            return fetchNextId();
+        }
+        throw new Exception("lack object");
     }
 
     class LoopNum{
@@ -65,22 +99,19 @@ public class SimpleObjectPool<E> {
         }
     }
 
+    public E get(int id){
+        return es[id];
+    }
+
     public E borrowObject() throws Exception{
-        int id = borrowNum.fetchNext();
+        int id = fetchNextId();
         E e = es[id];
-        if (e == null){
-            throw new Exception("object pool is not enough");
-        }
+        e.setAvailable(false);
         return e;
     }
 
     public void returnObject(E e){
-        int id = returnNum.fetchNext();
-        objectFactory.returnObject(e, id);
-        es[id] = e;
+        e.setAvailable(true);
     }
 
-    public static void main(String[] args) throws Exception {
-
-    }
 }

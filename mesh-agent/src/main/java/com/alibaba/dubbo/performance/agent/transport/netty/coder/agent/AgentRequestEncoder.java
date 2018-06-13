@@ -22,8 +22,6 @@ public class AgentRequestEncoder extends MessageToByteEncoder {
             int id = agentRequest.getId();
             out.writeInt(id);
             out.writeBytes(byteBuf);
-        } catch (Exception e){
-            throw e;
         } finally {
             ReferenceCountUtil.release(byteBufHolder);
         }

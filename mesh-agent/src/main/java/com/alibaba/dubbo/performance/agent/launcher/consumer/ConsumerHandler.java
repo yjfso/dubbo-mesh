@@ -2,6 +2,8 @@ package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 
+import com.alibaba.dubbo.performance.agent.transport.netty.http.HttpUtils;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
@@ -10,6 +12,10 @@ import io.netty.handler.codec.http.*;
 import io.netty.util.concurrent.ThreadPerTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -25,9 +31,9 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
+
 //        consumer.executorService.submit(()->{
-            try{
-                log.info("consumer got msg");
+//            try{
                 if (msg instanceof FullHttpRequest) {
                     FullHttpRequest req = (FullHttpRequest) msg;
                     HttpMethod httpMethod = req.method();
@@ -45,11 +51,11 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                         }
                     }
                 }
-            } catch (Exception e){
-                log.error("consumer server catch error", e);
-            } finally {
-//                ReferenceCountUtil.release(msg);
-            }
+//            } catch (Exception e){
+//                log.error("consumer server catch error", e);
+//            } finally {
+////                ReferenceCountUtil.release(msg);
+//            }
 //        });
     }
 
@@ -58,6 +64,11 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+//        agentClient.getConnectManager().removeChannel(ctx.channel());
     }
 
 }
