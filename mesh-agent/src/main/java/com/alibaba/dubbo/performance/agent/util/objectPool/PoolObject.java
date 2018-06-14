@@ -13,4 +13,5 @@ public interface PoolObject {
 
     void setAvailable(boolean available);
 
+    public void addLog(String s);
 }

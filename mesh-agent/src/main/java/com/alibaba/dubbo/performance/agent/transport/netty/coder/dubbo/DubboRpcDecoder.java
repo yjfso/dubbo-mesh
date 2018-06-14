@@ -1,6 +1,5 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo;
 
-import com.alibaba.dubbo.performance.agent.util.Bytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,7 +7,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class DubboRpcDecoder extends ByteToMessageDecoder {
@@ -58,13 +56,7 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
         if ((event & FLAG_EVENT) != 32){
             CompositeByteBuf compositeByteBuf = channelHandlerContext.alloc().compositeDirectBuffer(3);
             ByteBuf idBuf = byteBuf.slice(savedReaderIndex + 8, 4);
-            ByteBuf contentBuf = byteBuf.slice(savedReaderIndex + HEADER_LENGTH + 3, len - 5);
-
-            contentBuf.markReaderIndex();
-            byte[] cc = new byte[len - 5];
-            contentBuf.readBytes(cc);
-            System.out.println(cc);
-            contentBuf.resetReaderIndex();
+            ByteBuf contentBuf = byteBuf.slice(savedReaderIndex + HEADER_LENGTH + 2, len - 3);
 
             compositeByteBuf.addComponents(true, idBuf, contentBuf);
             byteBuf.retain();

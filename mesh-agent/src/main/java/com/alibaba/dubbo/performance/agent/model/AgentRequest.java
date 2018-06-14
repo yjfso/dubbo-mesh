@@ -74,24 +74,16 @@ public class AgentRequest extends AbstractRequest {
 
 
     public void done(FullHttpResponse rep) throws Exception{
+        if(getCtx()==null){
+            System.out.println(getId() + " in " + Thread.currentThread().getId()+" is valid");
+        }
         HttpUtils.response(getCtx(), keepAlive, rep);
         returnSelf();
     }
 
     public void done(ByteBuf byteBuf) throws Exception {
-        ByteBuf bb=byteBuf.slice(4, byteBuf.readableBytes());
-
-        int able = bb.readableBytes();
-        bb.markReaderIndex();
-        byte[] aa = new byte[able];
-        bb.readBytes(aa);
-        System.out.println(aa);
-        bb.resetReaderIndex();
-
         FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf.slice(4, byteBuf.readableBytes()));
         done(rep);
     }
-
-
 
 }

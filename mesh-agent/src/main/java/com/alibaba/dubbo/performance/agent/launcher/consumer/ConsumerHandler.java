@@ -16,6 +16,9 @@ import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -38,6 +41,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             log.info("route to " + endpoint);
             ChannelFuture channelFuture = endpoint.getChannelFuture(ctx);
             AgentRequest agentRequest = AgentRequest.getAgentRequest();
+
             agentRequest.setEndpoint(endpoint);
             CompositeByteBuf compositeByteBuf = ctx.alloc().compositeDirectBuffer(2);
 
@@ -54,7 +58,6 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                                     agentRequest.setKeepAlive(keepAlive);
 
                                     ByteBuf buf = agentRequest.getByteBufHolder().content();
-                                    log.info("consumer got a message length:" + buf.readableBytes());
                                     compositeByteBuf.capacity(4);
                                     compositeByteBuf.writeInt(agentRequest.getId());
                                     compositeByteBuf.addComponent(true, buf);

@@ -2,6 +2,8 @@ package com.alibaba.dubbo.performance.agent.model;
 
 
 import com.alibaba.dubbo.performance.agent.common.Const;
+import com.alibaba.dubbo.performance.agent.launcher.consumer.ConsumerHandler;
+import com.alibaba.dubbo.performance.agent.util.ByteBufUtil;
 import com.alibaba.dubbo.performance.agent.util.objectPool.SimpleObjectPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
@@ -12,6 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class DubboRequest extends AbstractRequest {
 
@@ -37,6 +42,7 @@ public class DubboRequest extends AbstractRequest {
     public void returnSelf() throws Exception{
         super.returnSelf();
         agentRequest = null;
+        agentRequestId = -1;
         getPool().returnObject(this);
     }
 
@@ -71,13 +77,14 @@ public class DubboRequest extends AbstractRequest {
     public void setAgentRequest(ByteBuf byteBuf){
         agentRequestId = byteBuf.readInt();
         int length = byteBuf.readableBytes();
-        this.agentRequest = new byte[length-4];
+        this.agentRequest = new byte[length];
         byteBuf.readBytes(this.agentRequest);
         ReferenceCountUtil.release(byteBuf);
     }
 
-    public void done(CompositeByteBuf byteBuf) throws Exception {
-        byteBuf.component(0).setInt(0, agentRequestId);
+    public void done(ByteBuf byteBuf) throws Exception {
+
+        byteBuf.setInt(0, agentRequestId);
 
         getCtx().writeAndFlush(byteBuf);
         returnSelf();

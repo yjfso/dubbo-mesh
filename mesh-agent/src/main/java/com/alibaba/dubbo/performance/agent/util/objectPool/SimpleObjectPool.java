@@ -103,11 +103,13 @@ public class SimpleObjectPool<E extends PoolObject> {
     public E borrowObject() throws Exception{
         int id = fetchNextId();
         E e = es[id];
+        e.addLog("borrow in "+Thread.currentThread().getId());
         e.setAvailable(false);
         return e;
     }
 
     public void returnObject(E e){
+        e.addLog("return in "+Thread.currentThread().getId());
         e.setAvailable(true);
     }
 

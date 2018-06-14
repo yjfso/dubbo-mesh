@@ -31,16 +31,15 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         DubboRequest dubboRequest = DubboRequest.getDubboRequest();
         dubboRequest.setEndpoint(endpoint);
         dubboRequest.setCtx(ctx);
+        ByteBuf byteBuf = (ByteBuf) msg;
+        dubboRequest.setAgentRequest(byteBuf);
+//        dubboRequest.done(ctx.alloc().directBuffer(20).writeLong(1l).writeLong(1l));
 
-        try{
-            ByteBuf byteBuf = (ByteBuf) msg;
-            log.info("byteBuf refCnt:" + byteBuf.refCnt());
-            dubboRequest.setAgentRequest(byteBuf);
+//        try{
             Provider.dubboClient.invoke(dubboRequest, channelFuture);
-        } catch (Exception e){
-            log.error("provider handler error", e);
-        }
-
+//        } catch (Exception e){
+//            log.error("provider handler error", e);
+//        }
     }
 
     @Override

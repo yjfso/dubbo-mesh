@@ -21,21 +21,17 @@ public class AgentDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         do {
             try {
-
-                log.info("agent decoder got a message");
                 int readable = byteBuf.readableBytes();
                 if (readable < 4) {
                     break;
                 }
                 int readerIndex = byteBuf.readerIndex();
                 int messageLength = byteBuf.getInt(readerIndex);
-                log.info(readerIndex + "|" + messageLength + "|" + readable);
+
                 if (readable < messageLength + 4) {
                     break;
                 }
                 ByteBuf subBuf = byteBuf.retainedSlice(readerIndex + 4, messageLength);
-                log.info("sub refCnt:" + subBuf.refCnt());
-                log.info("raw refCnt:" + byteBuf.refCnt());
                 out.add(subBuf);
                 byteBuf.readerIndex(readerIndex + messageLength + 4);
             } catch (Exception e) {

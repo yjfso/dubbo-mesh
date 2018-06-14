@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
+import com.alibaba.dubbo.performance.agent.util.ByteBufUtil;
 import com.alibaba.dubbo.performance.agent.util.Bytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -24,7 +25,11 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
             int id = byteBuf.readInt();
             AgentRequest agentRequest = AgentRequest.getPool().get(id);//[id];
             if(null != agentRequest){
-                agentRequest.done(byteBuf);
+                if(agentRequest.isAvailable()){
+                    agentRequest.printLog();
+                } else {
+                    agentRequest.done(byteBuf);
+                }
             }
         } catch (Exception e){
             log.error("consumer client response error", e);
