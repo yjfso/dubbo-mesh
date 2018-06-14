@@ -7,48 +7,42 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AgentDecoder extends ByteToMessageDecoder {
 
+    private final static Logger log = LoggerFactory.getLogger(AgentDecoder.class);
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        try {
-            do {
-                try {
-                    byteBuf.markReaderIndex();
-                    int readable = byteBuf.readableBytes();
-                    if (readable < 4) {
-                        byte[] b=  new byte[readable];
-                        byteBuf.readBytes(b);
-                        System.out.println(b);
-                        byteBuf.resetReaderIndex();
-                        break;
-                    }
+        do {
+            try {
 
-                    int messageLength = byteBuf.readInt();
-
-                    if (readable < messageLength + 4) {
-                        byteBuf.resetReaderIndex();
-                        break;
-                    }
-
-                    byte[] messageBody = new byte[messageLength];
-                    byteBuf.readBytes(messageBody);
-                    out.add(messageBody);
-                } catch (Exception e) {
-                    throw e;
+                log.info("agent decoder got a message");
+                int readable = byteBuf.readableBytes();
+                if (readable < 4) {
+                    break;
                 }
-
-            } while (byteBuf.isReadable());
-        } finally {
-            if (byteBuf.isReadable()) {
-                byteBuf.discardReadBytes();
+                int readerIndex = byteBuf.readerIndex();
+                int messageLength = byteBuf.getInt(readerIndex);
+                log.info(readerIndex + "|" + messageLength + "|" + readable);
+                if (readable < messageLength + 4) {
+                    break;
+                }
+                ByteBuf subBuf = byteBuf.retainedSlice(readerIndex + 4, messageLength);
+                log.info("sub refCnt:" + subBuf.refCnt());
+                log.info("raw refCnt:" + byteBuf.refCnt());
+                out.add(subBuf);
+                byteBuf.readerIndex(readerIndex + messageLength + 4);
+            } catch (Exception e) {
+                throw e;
             }
-        }
+        } while (byteBuf.isReadable());
+
     }
 
 }

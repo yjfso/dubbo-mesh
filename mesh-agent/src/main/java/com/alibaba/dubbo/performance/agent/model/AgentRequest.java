@@ -78,10 +78,17 @@ public class AgentRequest extends AbstractRequest {
         returnSelf();
     }
 
-    public void done(byte[] bytes) throws Exception {
-        ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(bytes.length-4).writeBytes(bytes, 4, bytes.length-4);
-//        ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes, 4, bytes.length-4);
-        FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf);
+    public void done(ByteBuf byteBuf) throws Exception {
+        ByteBuf bb=byteBuf.slice(4, byteBuf.readableBytes());
+
+        int able = bb.readableBytes();
+        bb.markReaderIndex();
+        byte[] aa = new byte[able];
+        bb.readBytes(aa);
+        System.out.println(aa);
+        bb.resetReaderIndex();
+
+        FullHttpResponse rep = new DefaultFullHttpResponse(HTTP_1_1, OK, byteBuf.slice(4, byteBuf.readableBytes()));
         done(rep);
     }
 

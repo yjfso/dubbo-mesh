@@ -27,7 +27,7 @@ public class Consumer {
         INSTANCE = this;
         bossGroup = new NioEventLoopGroup(Const.CONSUMER_SER_BOSS);
         workerGroup = new NioEventLoopGroup(Const.CONSUMER_SER_WORKER);
-        startWorkThread();
+//        startWorkThread();
         AgentClient.init();
         startServer();
     }

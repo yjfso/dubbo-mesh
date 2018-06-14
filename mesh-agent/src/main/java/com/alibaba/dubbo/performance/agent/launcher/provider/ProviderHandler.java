@@ -4,6 +4,7 @@ import com.alibaba.dubbo.performance.agent.launcher.consumer.AgentClient;
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,12 +21,7 @@ import java.util.concurrent.Executors;
 @ChannelHandler.Sharable
 public class ProviderHandler extends ChannelInboundHandlerAdapter {
 
-    private Provider provider;
     private final static Logger log = LoggerFactory.getLogger(ProviderHandler.class);
-
-    ProviderHandler(Provider provider){
-        this.provider = provider;
-    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
@@ -34,11 +30,12 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         ChannelFuture channelFuture = endpoint.getChannelFuture(ctx);
         DubboRequest dubboRequest = DubboRequest.getDubboRequest();
         dubboRequest.setEndpoint(endpoint);
-
         dubboRequest.setCtx(ctx);
+
         try{
-            byte[] bytes = (byte[]) msg;
-            dubboRequest.setAgentRequest(bytes);
+            ByteBuf byteBuf = (ByteBuf) msg;
+            log.info("byteBuf refCnt:" + byteBuf.refCnt());
+            dubboRequest.setAgentRequest(byteBuf);
             Provider.dubboClient.invoke(dubboRequest, channelFuture);
         } catch (Exception e){
             log.error("provider handler error", e);

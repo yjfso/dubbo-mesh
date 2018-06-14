@@ -2,7 +2,11 @@ package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelUtil;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,9 +39,10 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
             ChannelFuture channelFuture = endpoint.getChannelFuture(ctx);
             AgentRequest agentRequest = AgentRequest.getAgentRequest();
             agentRequest.setEndpoint(endpoint);
+            CompositeByteBuf compositeByteBuf = ctx.alloc().compositeDirectBuffer(2);
 
-            Consumer.executorService.submit(
-                    ()->{
+//            Consumer.executorService.submit(
+//                    ()->{
                         try {
                             if (msg instanceof FullHttpRequest) {
                                 FullHttpRequest req = (FullHttpRequest) msg;
@@ -47,7 +52,14 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                                     agentRequest.setByteBufHolder(req);
                                     agentRequest.setCtx(ctx);
                                     agentRequest.setKeepAlive(keepAlive);
-                                    AgentClient.INSTANCE.invoke(agentRequest, channelFuture);
+
+                                    ByteBuf buf = agentRequest.getByteBufHolder().content();
+                                    log.info("consumer got a message length:" + buf.readableBytes());
+                                    compositeByteBuf.capacity(4);
+                                    compositeByteBuf.writeInt(agentRequest.getId());
+                                    compositeByteBuf.addComponent(true, buf);
+
+                                    ChannelUtil.writeAndFlush(channelFuture, compositeByteBuf);
                                     return;
                                 }
                             }
@@ -55,13 +67,14 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                             log.error("consumer message handle error", e);
                         }
                         try{
+                            log.error("agentRequest not success");
                             agentRequest.done(new DefaultFullHttpResponse(HTTP_1_1, OK));
                         } catch (Exception e){
                             log.error("agent done error");
                         }
                     }
-            );
-        }
+//            );
+//        }
     }
 
     @Override

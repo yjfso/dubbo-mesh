@@ -1,5 +1,6 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelUtil;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.launcher.provider.DubboClient;
@@ -42,20 +43,6 @@ public class AgentClient {
             logger.error("consumer start error", e);
         }
 
-    }
-
-    public void invoke(AgentRequest agentRequest, ChannelFuture channelFuture) throws Exception {
-
-        ByteBuf buf = agentRequest.getByteBufHolder().content();
-        int len = 4 + buf.readableBytes();
-        CompositeByteBuf compositeByteBuf = PooledByteBufAllocator.DEFAULT.compositeDirectBuffer();
-        compositeByteBuf.writeInt(len);
-        compositeByteBuf.writeInt(agentRequest.getId());
-        compositeByteBuf.addComponent(true, buf);
-        System.out.println(buf.readableBytes());
-        System.out.println(compositeByteBuf.readableBytes());
-        ReferenceCountUtil.retain(buf);
-        Endpoint.writeAndFlush(channelFuture, compositeByteBuf);
     }
 
     public ConnectManager getConnectManager() {

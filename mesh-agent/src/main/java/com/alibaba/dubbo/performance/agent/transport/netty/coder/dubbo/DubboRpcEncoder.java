@@ -12,13 +12,13 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
 
 
     // header length.
-    protected static final int HEADER_LENGTH = 16;
+    private static final int HEADER_LENGTH = 16;
     // magic header.
-    protected static final short MAGIC = (short) 0xdabb;
+    private static final short MAGIC = (short) 0xdabb;
     // message flag.
-    protected static final byte FLAG_REQUEST = (byte) 0x80;
-    protected static final byte FLAG_TWOWAY = (byte) 0x40;
-    protected static final byte FLAG_EVENT = (byte) 0x20;
+    private static final byte FLAG_REQUEST = (byte) 0x80;
+    private static final byte FLAG_TWOWAY = (byte) 0x40;
+    private static final byte FLAG_EVENT = (byte) 0x20;
     private final static byte[] headerBase = new byte[HEADER_LENGTH];
 
     static {
@@ -48,21 +48,22 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
             // set request id.
             Bytes.int2bytes(req.getId(), header, 8);
 
-            ByteBuf byteBuf = encodeRequestData(req.getData());
+            ByteBuf byteBuf = ctx.alloc().directBuffer();
+            encodeRequestData(req.getData(), byteBuf);
 
             len = byteBuf.readableBytes();
 
             Bytes.int2bytes(len, header, 12);
             buffer.writeBytes(header);
             buffer.writeBytes(byteBuf);
+            byteBuf.release();
         }
     }
 
 
-    public ByteBuf encodeRequestData(Object data) throws Exception {
+    public ByteBuf encodeRequestData(Object data, ByteBuf byteBuf) throws Exception {
         RpcInvocation inv = (RpcInvocation)data;
 
-        ByteBuf byteBuf = Unpooled.buffer();
         writeString(byteBuf, Const.DUBBO_VERSION);
         writeString(byteBuf, inv.getInterfaceName());
         writeNull(byteBuf);

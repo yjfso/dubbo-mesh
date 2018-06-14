@@ -3,6 +3,9 @@ package com.alibaba.dubbo.performance.agent.model;
 
 import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.util.objectPool.SimpleObjectPool;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.FastThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,7 @@ import java.util.List;
 public class DubboRequest extends AbstractRequest {
 
     private final static Logger log = LoggerFactory.getLogger(DubboRequest.class);
+    private int agentRequestId;
     private byte[] agentRequest;
     private boolean twoWay = true;
     private boolean event = false;
@@ -64,13 +68,18 @@ public class DubboRequest extends AbstractRequest {
         mData = msg;
     }
 
-    public void setAgentRequest(byte[] bytes){
-        this.agentRequest = bytes;
+    public void setAgentRequest(ByteBuf byteBuf){
+        agentRequestId = byteBuf.readInt();
+        int length = byteBuf.readableBytes();
+        this.agentRequest = new byte[length-4];
+        byteBuf.readBytes(this.agentRequest);
+        ReferenceCountUtil.release(byteBuf);
     }
 
-    public void done(byte[] result) throws Exception {
-        System.arraycopy(agentRequest, 0, result, 0, 4);
-        getCtx().writeAndFlush(result);
+    public void done(CompositeByteBuf byteBuf) throws Exception {
+        byteBuf.component(0).setInt(0, agentRequestId);
+
+        getCtx().writeAndFlush(byteBuf);
         returnSelf();
     }
 

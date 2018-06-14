@@ -2,11 +2,13 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 import com.alibaba.dubbo.performance.agent.model.dubbo.HTTPDecoder;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelUtil;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -31,8 +33,8 @@ public class DubboClient {
     }
 
     public void invoke(DubboRequest dubboRequest, ChannelFuture channelFuture) throws Exception {
-        byte[] bytes = dubboRequest.getAgentRequest();
-        Map<String, byte[]> pars = HTTPDecoder.decode(bytes, 4);
+        byte[] byteBuf = dubboRequest.getAgentRequest();
+        Map<String, byte[]> pars = HTTPDecoder.decode(byteBuf, 0);
 
         RpcInvocation invocation = new RpcInvocation();
         invocation.setMethodName(pars.get("method"));
@@ -42,7 +44,7 @@ public class DubboClient {
 
         dubboRequest.setData(invocation);
 
-        Endpoint.writeAndFlush(channelFuture, dubboRequest);
+        ChannelUtil.writeAndFlush(channelFuture, dubboRequest);
 
     }
 

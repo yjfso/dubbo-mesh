@@ -3,32 +3,37 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 
 import com.alibaba.dubbo.performance.agent.util.Bytes;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ChannelHandler.Sharable
-public class DubboClientHandler extends SimpleChannelInboundHandler<byte[]> {
+public class DubboClientHandler extends ChannelInboundHandlerAdapter {
 
 
     private final static Logger log = LoggerFactory.getLogger(DubboClientHandler.class);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] response) {
+    public void channelRead(ChannelHandlerContext channelHandlerContext, Object response) {
         try{
-            int requestId = Bytes.bytes2int(response, 0);
-            if (requestId==-1){
+            if (response==null){
                 DubboRequest dubboRequest = new DubboRequest();
                 dubboRequest.setTwoWay(false);
                 dubboRequest.setEvent(true);
                 channelHandlerContext.writeAndFlush(dubboRequest);
             } else {
+                CompositeByteBuf byteBuf = (CompositeByteBuf)response;
+
+                int requestId = byteBuf.getInt(0);
                 DubboRequest dubboRequest = DubboRequest.getPool().get(requestId);
                 if(null != dubboRequest){
-                    dubboRequest.done(response);
+                    dubboRequest.done(byteBuf);
                 }
             }
         }
