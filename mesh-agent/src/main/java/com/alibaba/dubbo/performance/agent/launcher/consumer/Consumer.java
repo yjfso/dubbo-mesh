@@ -21,14 +21,12 @@ public class Consumer {
 
     private static EventLoopGroup bossGroup;
     private static EventLoopGroup workerGroup;
-    public static ExecutorService executorService;
 
     private Consumer() throws Exception{
 
         INSTANCE = this;
         bossGroup = new NioEventLoopGroup(Const.CONSUMER_SER_BOSS);
         workerGroup = new NioEventLoopGroup(Const.CONSUMER_SER_WORKER);
-//        startWorkThread();
         AgentClient.init();
         startServer();
     }
@@ -51,10 +49,6 @@ public class Consumer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-
-    private void startWorkThread(){
-        executorService = Executors.newFixedThreadPool(Const.CONSUMER_EXECUTOR);
     }
 
 }

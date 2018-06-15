@@ -20,7 +20,6 @@ public class Const {
     public final static int MAX_DUBBO_REQUEST = 200;
     public final static int CONSUMER_SER_BOSS = 1;
     public final static int CONSUMER_SER_WORKER = 8;
-    public final static int CONSUMER_EXECUTOR = 500;
     public final static int PROVIDER_SER_BOSS = 1;
     public final static int PROVIDER_SER_WORKER = 16;
 
