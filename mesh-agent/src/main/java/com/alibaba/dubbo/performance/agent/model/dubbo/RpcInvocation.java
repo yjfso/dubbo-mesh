@@ -16,10 +16,7 @@
  */
 package com.alibaba.dubbo.performance.agent.model.dubbo;
 
-
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class RpcInvocation implements Serializable {
@@ -34,7 +31,6 @@ public class RpcInvocation implements Serializable {
 
     private byte[] interfaceName;
 
-    private Map<String, String> attachments;
 
     public RpcInvocation() {
     }
@@ -63,34 +59,6 @@ public class RpcInvocation implements Serializable {
         this.arguments = arguments;
     }
 
-    public void setAttachment(String key, String value) {
-        if (attachments == null) {
-            attachments = new HashMap<>();
-        }
-        attachments.put(key, value);
-    }
-
-    public String getAttachment(String key, String defaultValue) {
-        if (attachments == null) {
-            return defaultValue;
-        }
-        String value = attachments.get(key);
-        if (value == null || value.length() == 0) {
-            return defaultValue;
-        }
-        return value;
-    }
-
-    public String getAttachment(String key) {
-        if (attachments == null) {
-            return null;
-        }
-        return attachments.get(key);
-    }
-
-    public Map<String, String> getAttachments() {
-        return attachments;
-    }
 
     public byte[] getInterfaceName() {
         return interfaceName;

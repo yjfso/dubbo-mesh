@@ -5,12 +5,19 @@ import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 import com.alibaba.dubbo.performance.agent.util.Bytes;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 import io.netty.buffer.*;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public class DubboRpcEncoder extends MessageToByteEncoder{
+import java.nio.Buffer;
+
+@ChannelHandler.Sharable
+public class DubboRpcEncoder extends ChannelOutboundHandlerAdapter {
 
 
+    public static final DubboRpcEncoder INSTANCE = new DubboRpcEncoder();
     // header length.
     private static final int HEADER_LENGTH = 16;
     // magic header.
@@ -19,49 +26,56 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
     private static final byte FLAG_REQUEST = (byte) 0x80;
     private static final byte FLAG_TWOWAY = (byte) 0x40;
     private static final byte FLAG_EVENT = (byte) 0x20;
-    private final static byte[] headerBase = new byte[HEADER_LENGTH];
+    private static final byte FASTJSON = 6;
 
+
+    private static ByteBuf requestHeader;
+    private static ByteBuf eventHeader;
     static {
-        Bytes.short2bytes(MAGIC, headerBase);
-        headerBase[2] = (byte) (FLAG_REQUEST | 6);
+        byte eventH2 = FLAG_REQUEST | FASTJSON | FLAG_EVENT;
+        byte requestH2 = FLAG_REQUEST | FASTJSON | FLAG_TWOWAY;
+
+        requestHeader = PooledByteBufAllocator.DEFAULT.directBuffer(HEADER_LENGTH);
+        requestHeader.writeLong(0).writeLong(0);
+        requestHeader.setShort(0, MAGIC);
+        requestHeader.setByte(2, requestH2);
+
+        eventHeader = requestHeader.copy();
+        eventHeader.setByte(2, eventH2);
+
+    }
+    private ByteBuf getRequestHeader(ChannelHandlerContext ctx){
+        return requestHeader.copy();
     }
 
-    private byte[] getNewHeader(){
-        byte[] header = new byte[HEADER_LENGTH];
-        System.arraycopy(headerBase, 0, header, 0, 3);
-        return header;
+    private ByteBuf getEventHeader(ChannelHandlerContext ctx){
+        return eventHeader.copy();
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf buffer) throws Exception {
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+
         DubboRequest req = (DubboRequest)msg;
+        ByteBuf result;
 
-        // header.
-        byte[] header = getNewHeader();
-
-        int len = 0;
-        if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;
         if (req.isEvent()){
-            header[2] |= FLAG_EVENT;
-            buffer.writeBytes(header);
+            result = getEventHeader(ctx);
         } else {
-            // set request id.
-            Bytes.int2bytes(req.getId(), header, 8);
+            CompositeByteBuf requestByteBuf = ctx.alloc().compositeDirectBuffer(2);
+            requestByteBuf.addComponent(true, getRequestHeader(ctx));
+            requestByteBuf.setInt(8, req.getId());
 
-            ByteBuf byteBuf = ctx.alloc().directBuffer();
-            encodeRequestData(req.getData(), byteBuf);
+            encodeRequestData(req.getData(), requestByteBuf);
+            int len = requestByteBuf.readableBytes() - HEADER_LENGTH;
+            requestByteBuf.setInt(12, len);
 
-            len = byteBuf.readableBytes();
-
-            Bytes.int2bytes(len, header, 12);
-            buffer.writeBytes(header);
-            buffer.writeBytes(byteBuf);
-            byteBuf.release();
+            result = requestByteBuf;
         }
+        ctx.write(result, promise);
     }
 
 
-    public ByteBuf encodeRequestData(Object data, ByteBuf byteBuf) throws Exception {
+    private void encodeRequestData(Object data, ByteBuf byteBuf) throws Exception {
         RpcInvocation inv = (RpcInvocation)data;
 
         writeString(byteBuf, Const.DUBBO_VERSION);
@@ -79,7 +93,6 @@ public class DubboRpcEncoder extends MessageToByteEncoder{
 //        System.out.println(new String(result).replaceAll("(\\r\\n|\\r|\\n|\\n\\r)", ""));
 //        byteBuf.readerIndex(index);
 
-        return byteBuf;
     }
 
     private void writeNull(ByteBuf byteBuf){

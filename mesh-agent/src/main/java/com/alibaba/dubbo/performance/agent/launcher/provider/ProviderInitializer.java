@@ -18,7 +18,7 @@ public class ProviderInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new AgentDecoder());
-        pipeline.addLast("encoder", new AgentEncoder());
+        pipeline.addLast("encoder", AgentEncoder.INSTANCE);
         pipeline.addLast(new ProviderHandler());
 
     }

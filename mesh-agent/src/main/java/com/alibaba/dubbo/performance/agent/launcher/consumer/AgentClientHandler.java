@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.collection.IntObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,11 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger log = LoggerFactory.getLogger(AgentClientHandler.class);
 
+    public final static AgentClientHandler INSTANCE = new AgentClientHandler();
+
+    private AgentClientHandler(){
+
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
@@ -26,7 +32,7 @@ public class AgentClientHandler extends ChannelInboundHandlerAdapter {
             AgentRequest agentRequest = AgentRequest.getPool().get(id);//[id];
             if(null != agentRequest){
                 if(agentRequest.isAvailable()){
-                    agentRequest.printLog();
+                    log.error("client got a response without source Request");
                 } else {
                     agentRequest.done(byteBuf);
                 }

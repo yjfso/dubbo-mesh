@@ -44,6 +44,7 @@ public class Consumer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ConsumerInitializer())
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.TCP_NODELAY, false)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {

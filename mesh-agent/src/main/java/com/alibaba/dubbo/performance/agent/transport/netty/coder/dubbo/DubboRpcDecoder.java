@@ -2,6 +2,7 @@ package com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
@@ -10,12 +11,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class DubboRpcDecoder extends ByteToMessageDecoder {
-    // header length.
-    private final static Logger log = LoggerFactory.getLogger(DubboRpcDecoder.class);
-    protected static final int HEADER_LENGTH = 16;
 
-    protected static final byte FLAG_EVENT = (byte) 0x20;
-    protected static final byte[] EVENT_RESPONSE = new byte[]{-1, -1, -1, -1};
+    private final static Logger log = LoggerFactory.getLogger(DubboRpcDecoder.class);
+    private static final int HEADER_LENGTH = 16;
+
+    private static final byte FLAG_EVENT = (byte) 0x20;
 
 
     @Override

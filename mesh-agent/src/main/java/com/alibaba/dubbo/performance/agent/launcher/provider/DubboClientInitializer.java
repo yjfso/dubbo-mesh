@@ -13,9 +13,9 @@ public class DubboClientInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) {
         ChannelPipeline pipeline = socketChannel.pipeline();
-        pipeline.addLast(new DubboRpcEncoder());
+        pipeline.addLast(DubboRpcEncoder.INSTANCE);
         pipeline.addLast(new DubboRpcDecoder());
-        pipeline.addLast(new DubboClientHandler());
+        pipeline.addLast(DubboClientHandler.INSTANCE);
     }
 }
 

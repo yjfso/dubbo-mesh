@@ -1,17 +1,13 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.coder.agent;
 
 
-import com.alibaba.dubbo.performance.agent.transport.netty.coder.dubbo.DubboRpcDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AgentDecoder extends ByteToMessageDecoder {
 

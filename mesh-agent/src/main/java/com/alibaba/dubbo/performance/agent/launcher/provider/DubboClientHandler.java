@@ -18,15 +18,15 @@ public class DubboClientHandler extends ChannelInboundHandlerAdapter {
 
 
     private final static Logger log = LoggerFactory.getLogger(DubboClientHandler.class);
+    public final static DubboClientHandler INSTANCE = new DubboClientHandler();
 
     @Override
     public void channelRead(ChannelHandlerContext channelHandlerContext, Object response) {
         try{
             if (response==null){
                 DubboRequest dubboRequest = new DubboRequest();
-                dubboRequest.setTwoWay(false);
                 dubboRequest.setEvent(true);
-                channelHandlerContext.writeAndFlush(dubboRequest);
+                channelHandlerContext.writeAndFlush(dubboRequest, channelHandlerContext.voidPromise());
             } else {
                 CompositeByteBuf byteBuf = (CompositeByteBuf)response;
 
@@ -50,7 +50,7 @@ public class DubboClientHandler extends ChannelInboundHandlerAdapter {
             DubboRequest dubboRequest = new DubboRequest();
             dubboRequest.setTwoWay(false);
             dubboRequest.setEvent(true);
-            ctx.writeAndFlush(dubboRequest);
+            ctx.writeAndFlush(dubboRequest, ctx.voidPromise());
         }
     }
 

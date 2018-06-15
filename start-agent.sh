@@ -26,7 +26,7 @@ elif [[ "$1" == "provider-small" ]]; then
        -Dio.netty.leakDetectionLevel=DISABLED \
        -Ddubbo.protocol.port=20880 \
        -Dserver.port=30000 \
-       -Dserver.weight=4 \
+       -Dserver.weight=5 \
        -Detcd.url=$ETCD_URL \
        -Dlogs.dir=/root/logs \
        /root/dists/mesh-agent.jar

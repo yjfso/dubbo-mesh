@@ -2,12 +2,19 @@ package com.alibaba.dubbo.performance.agent.transport.netty.coder.agent;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 
+@ChannelHandler.Sharable
 public class AgentEncoder extends ChannelOutboundHandlerAdapter {
+    public final static AgentEncoder INSTANCE = new AgentEncoder();
 
+    private AgentEncoder(){
+    }
+
+    @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
         int readableBytes = byteBuf.readableBytes();

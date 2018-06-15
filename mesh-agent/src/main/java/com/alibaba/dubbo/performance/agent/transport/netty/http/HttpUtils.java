@@ -4,14 +4,9 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import io.netty.handler.codec.http.multipart.HttpPostStandardRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import io.undertow.server.handlers.URLDecodingHandler;
-import io.undertow.util.URLUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,9 +39,9 @@ public class HttpUtils {
         response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
         if(keepAlive){
             response.headers().set(CONNECTION, CONNECTION);
-            ctx.writeAndFlush(response);
+            ctx.writeAndFlush(response, ctx.voidPromise());
         } else{
-            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            ctx.writeAndFlush(response, ctx.voidPromise()).addListener(ChannelFutureListener.CLOSE);
         }
     }
 }
