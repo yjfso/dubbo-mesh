@@ -86,7 +86,8 @@ public class DubboRequest extends AbstractRequest {
 
         byteBuf.setInt(0, agentRequestId);
 
-        getCtx().writeAndFlush(byteBuf, getCtx().voidPromise());
+        getChannelWriter().smartWrite(byteBuf);
+//        getCtx().writeAndFlush(byteBuf, getCtx().voidPromise());
         returnSelf();
     }
 

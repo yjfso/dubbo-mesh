@@ -28,7 +28,7 @@ public class DubboClientHandler extends ChannelInboundHandlerAdapter {
                 dubboRequest.setEvent(true);
                 channelHandlerContext.writeAndFlush(dubboRequest, channelHandlerContext.voidPromise());
             } else {
-                CompositeByteBuf byteBuf = (CompositeByteBuf)response;
+                ByteBuf byteBuf = (ByteBuf)response;
 
                 int requestId = byteBuf.getInt(0);
                 DubboRequest dubboRequest = DubboRequest.getPool().get(requestId);

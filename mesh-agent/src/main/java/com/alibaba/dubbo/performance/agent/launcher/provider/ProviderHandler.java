@@ -3,6 +3,7 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 import com.alibaba.dubbo.performance.agent.launcher.consumer.AgentClient;
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelWriter;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
@@ -30,7 +31,7 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         ChannelFuture channelFuture = endpoint.getChannelFuture(ctx);
         DubboRequest dubboRequest = DubboRequest.getDubboRequest();
         dubboRequest.setEndpoint(endpoint);
-        dubboRequest.setCtx(ctx);
+        dubboRequest.setChannelWriter(ctx);
         ByteBuf byteBuf = (ByteBuf) msg;
         dubboRequest.setAgentRequest(byteBuf);
 //        dubboRequest.done(ctx.alloc().directBuffer(20).writeLong(1l).writeLong(1l));
@@ -41,6 +42,17 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
 //            log.error("provider handler error", e);
 //        }
     }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ChannelWriter.INSTANCES.put(ctx, new ChannelWriter(ctx));
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ChannelWriter.INSTANCES.remove(ctx);
+    }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)

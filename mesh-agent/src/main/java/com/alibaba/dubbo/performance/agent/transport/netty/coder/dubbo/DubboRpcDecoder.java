@@ -16,6 +16,7 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
     private static final int HEADER_LENGTH = 16;
 
     private static final byte FLAG_EVENT = (byte) 0x20;
+    private static final int RESPONSE_OK = 20;
 
 
     @Override
@@ -50,18 +51,20 @@ public class DubboRpcDecoder extends ByteToMessageDecoder {
         if (readable < len + HEADER_LENGTH) {
             return null;
         }
-
-        byte event = byteBuf.getByte(savedReaderIndex + 2);
+        byteBuf.readerIndex(savedReaderIndex + 2);
+        byte event = byteBuf.readByte();
         Object object = null;
         if ((event & FLAG_EVENT) != 32){
-            CompositeByteBuf compositeByteBuf = channelHandlerContext.alloc().compositeDirectBuffer(3);
-            ByteBuf idBuf = byteBuf.slice(savedReaderIndex + 8, 4);
-            ByteBuf contentBuf = byteBuf.slice(savedReaderIndex + HEADER_LENGTH + 2, len - 3);
-
-            compositeByteBuf.addComponents(true, idBuf, contentBuf);
-            byteBuf.retain();
-            byteBuf.retain();
-            object = compositeByteBuf;
+            int status = byteBuf.readByte();
+            ByteBuf idBuf = byteBuf.retainedSlice(savedReaderIndex + 8, 4);
+            if (status == RESPONSE_OK){
+                CompositeByteBuf compositeByteBuf = channelHandlerContext.alloc().compositeDirectBuffer(3);
+                ByteBuf contentBuf = byteBuf.retainedSlice(savedReaderIndex + HEADER_LENGTH + 2, len - 3);
+                compositeByteBuf.addComponents(true, idBuf, contentBuf);
+                object = compositeByteBuf;
+            } else{
+                object = idBuf;
+            }
         }
 
         byteBuf.readerIndex(savedReaderIndex + len + HEADER_LENGTH);

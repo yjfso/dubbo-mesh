@@ -74,9 +74,6 @@ public class AgentRequest extends AbstractRequest {
 
 
     public void done(FullHttpResponse rep) throws Exception{
-        if(getCtx()==null){
-            System.out.println(getId() + " in " + Thread.currentThread().getId()+" is valid");
-        }
         HttpUtils.response(getCtx(), keepAlive, rep);
         returnSelf();
     }

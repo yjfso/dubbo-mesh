@@ -2,15 +2,13 @@ package com.alibaba.dubbo.performance.agent.launcher.provider;
 
 import com.alibaba.dubbo.performance.agent.model.DubboRequest;
 import com.alibaba.dubbo.performance.agent.model.dubbo.HTTPDecoder;
-import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelUtil;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelWriter;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ClientConnectManager;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import com.alibaba.dubbo.performance.agent.model.dubbo.RpcInvocation;
 
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ConnectManager;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +42,7 @@ public class DubboClient {
 
         dubboRequest.setData(invocation);
 
-        ChannelUtil.writeAndFlush(channelFuture, dubboRequest);
+        ChannelWriter.writeAndFlush(channelFuture, dubboRequest);
 
     }
 

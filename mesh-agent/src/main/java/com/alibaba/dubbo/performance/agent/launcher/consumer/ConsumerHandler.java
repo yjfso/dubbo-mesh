@@ -2,7 +2,7 @@ package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 
-import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelUtil;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelWriter;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
@@ -13,7 +13,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.internal.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                     if (HttpMethod.POST.equals(httpMethod) ) {
                         boolean keepAlive = HttpUtil.isKeepAlive(req);
                         agentRequest.setByteBufHolder(req);
-                        agentRequest.setCtx(ctx);
+                        agentRequest.setChannelWriter(ctx);
                         agentRequest.setKeepAlive(keepAlive);
 
                         ByteBuf buf = agentRequest.getByteBufHolder().content();
@@ -60,7 +59,7 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                         compositeByteBuf.writeInt(agentRequest.getId());
                         compositeByteBuf.addComponent(true, buf);
 
-                        ChannelUtil.writeAndFlush(channelFuture, compositeByteBuf);
+                        ChannelWriter.writeAndFlush(channelFuture, compositeByteBuf);
                         return;
                     }
                 }
@@ -86,7 +85,13 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//        agentClient.getConnectManager().removeChannel(ctx.channel());
+        ChannelWriter.INSTANCES.put(ctx, new ChannelWriter(ctx));
     }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ChannelWriter.INSTANCES.remove(ctx);
+    }
+
 
 }
