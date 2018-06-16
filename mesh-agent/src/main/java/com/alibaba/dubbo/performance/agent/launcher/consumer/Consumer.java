@@ -5,12 +5,11 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
+
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -25,8 +24,9 @@ public class Consumer {
     private Consumer() throws Exception{
 
         INSTANCE = this;
-        bossGroup = new NioEventLoopGroup(Const.CONSUMER_SER_BOSS);
-        workerGroup = new NioEventLoopGroup(Const.CONSUMER_SER_WORKER);
+
+        bossGroup = Const.EVENT_LOOP_GROUP.getConstructor(int.class).newInstance(Const.CONSUMER_SER_BOSS);
+        workerGroup = Const.EVENT_LOOP_GROUP.getConstructor(int.class).newInstance(Const.CONSUMER_SER_WORKER);
         AgentClient.init();
         startServer();
     }
@@ -39,7 +39,7 @@ public class Consumer {
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(KQueueServerSocketChannel.class)
                     .childHandler(new ConsumerInitializer())
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, false)

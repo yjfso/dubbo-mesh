@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import java.util.Map;
+
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -85,12 +87,12 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ChannelWriter.INSTANCES.put(ctx, new ChannelWriter(ctx));
+        ChannelWriter.putInstance(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ChannelWriter.INSTANCES.remove(ctx);
+        ChannelWriter.removeInstance(ctx);
     }
 
 

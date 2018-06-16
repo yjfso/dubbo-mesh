@@ -4,16 +4,13 @@ import com.alibaba.dubbo.performance.agent.common.Const;
 import com.alibaba.dubbo.performance.agent.registry.EtcdRegistry;
 import com.alibaba.dubbo.performance.agent.registry.IRegistry;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 /**
  * Created by yinjianfeng on 18/5/27.
@@ -30,8 +27,10 @@ public class Provider {
 
     private Provider() throws Exception{
         INSTANCE = this;
-        bossGroup = new NioEventLoopGroup(Const.PROVIDER_SER_BOSS);
-        workerGroup = new NioEventLoopGroup(Const.PROVIDER_SER_WORKER);
+
+        bossGroup = Const.EVENT_LOOP_GROUP.getConstructor(int.class).newInstance(Const.PROVIDER_SER_BOSS);
+        workerGroup = Const.EVENT_LOOP_GROUP.getConstructor(int.class).newInstance(Const.PROVIDER_SER_WORKER);
+
         dubboClient = new DubboClient();
         registerServer();
 //        startWorkThread();
@@ -45,7 +44,7 @@ public class Provider {
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(Const.SERVER_SOCKET_CHANNEL)
                     .childHandler(new ProviderInitializer())
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)

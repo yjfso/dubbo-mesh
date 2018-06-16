@@ -1,13 +1,7 @@
 package com.alibaba.dubbo.performance.agent.transport.netty.manager;
 
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoop;
-import io.netty.channel.pool.ChannelPoolHandler;
-import io.netty.channel.pool.FixedChannelPool;
 import io.netty.util.concurrent.FastThreadLocal;
-import io.netty.util.concurrent.FastThreadLocalThread;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

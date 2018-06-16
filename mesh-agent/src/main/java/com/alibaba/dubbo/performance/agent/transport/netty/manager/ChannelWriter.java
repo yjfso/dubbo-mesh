@@ -4,24 +4,21 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.FastThreadLocal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class ChannelWriter {
 
-    public final static Map<ChannelHandlerContext, ChannelWriter> INSTANCES = new ConcurrentHashMap<>();
+    public final static FastThreadLocal<Map<ChannelHandlerContext, ChannelWriter>> INSTANCES = new FastThreadLocal<>();
     private ChannelHandlerContext ctx;
     private final static int MAX_BUF = 300;
     private volatile int pending = 0;
     private Runnable runnable = this::flush;
 
-    public ChannelWriter(ChannelHandlerContext ctx) {
+    private ChannelWriter(ChannelHandlerContext ctx) {
         this.ctx = ctx;
     }
 
@@ -48,6 +45,21 @@ public class ChannelWriter {
         this.ctx = ctx;
     }
 
+    public static void removeInstance(ChannelHandlerContext ctx) {
+        INSTANCES.get().remove(ctx);
+    }
+    public static void putInstance(ChannelHandlerContext ctx){
+        Map<ChannelHandlerContext, ChannelWriter> instances = INSTANCES.get();
+        if (instances == null) {
+            instances = new HashMap<>();
+            INSTANCES.set(instances);
+        }
+        instances.put(ctx, new ChannelWriter(ctx));
+    }
+
+    public static ChannelWriter getInstance(ChannelHandlerContext ctx){
+        return INSTANCES.get().get(ctx);
+    }
     public static void writeAndFlush(ChannelFuture channelFuture, Object object){
         if(channelFuture.isDone()){
             channelFuture.channel().writeAndFlush(object, channelFuture.channel().voidPromise());

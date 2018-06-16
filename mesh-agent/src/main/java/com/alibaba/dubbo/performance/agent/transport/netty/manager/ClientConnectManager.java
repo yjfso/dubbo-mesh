@@ -4,7 +4,6 @@ import com.alibaba.dubbo.performance.agent.common.Const;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
 //                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .channel(NioSocketChannel.class)
+                .channel(Const.SOCKET_CHANNEL)
                 .handler(channelInitializer);
     }
 

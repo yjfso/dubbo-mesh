@@ -34,23 +34,23 @@ public class ProviderHandler extends ChannelInboundHandlerAdapter {
         dubboRequest.setChannelWriter(ctx);
         ByteBuf byteBuf = (ByteBuf) msg;
         dubboRequest.setAgentRequest(byteBuf);
-//        dubboRequest.done(ctx.alloc().directBuffer(20).writeLong(1l).writeLong(1l));
 
-//        try{
+        try{
             Provider.dubboClient.invoke(dubboRequest, channelFuture);
-//        } catch (Exception e){
-//            log.error("provider handler error", e);
-//        }
+        } catch (Exception e){
+            dubboRequest.returnSelf();
+            log.error("provider handler error", e);
+        }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ChannelWriter.INSTANCES.put(ctx, new ChannelWriter(ctx));
+        ChannelWriter.putInstance(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ChannelWriter.INSTANCES.remove(ctx);
+        ChannelWriter.removeInstance(ctx);
     }
 
 

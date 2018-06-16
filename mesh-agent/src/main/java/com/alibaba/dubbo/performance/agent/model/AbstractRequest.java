@@ -22,7 +22,7 @@ public abstract class AbstractRequest extends AbstractPoolObject {
     }
 
     public void setChannelWriter(ChannelHandlerContext ctx) {
-        this.channelWriter = ChannelWriter.INSTANCES.get(ctx);
+        this.channelWriter = ChannelWriter.getInstance(ctx);
     }
 
     protected void returnSelf() throws Exception{
