@@ -24,8 +24,8 @@ public class Const {
 
     public final static int LOAD_BALANCE_REFRESH_TIME = 2;
 
-    public final static int AGENT_REQUEST_NUM = 500;
-    public final static int DUBBO_REQUEST_NUM = 300;
+    public final static int AGENT_REQUEST_NUM = 1000;
+    public final static int DUBBO_REQUEST_NUM = 800;
 
     public final static int MAX_DUBBO_REQUEST = 185;
     public final static int CONSUMER_SER_BOSS = 1;
