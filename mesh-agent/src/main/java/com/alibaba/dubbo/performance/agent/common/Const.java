@@ -29,9 +29,9 @@ public class Const {
 
     public final static int MAX_DUBBO_REQUEST = 185;
     public final static int CONSUMER_SER_BOSS = 1;
-    public final static int CONSUMER_SER_WORKER = 16;
+    public final static int CONSUMER_SER_WORKER = 4;
     public final static int PROVIDER_SER_BOSS = 1;
-    public final static int PROVIDER_SER_WORKER = 16;
+    public final static int PROVIDER_SER_WORKER = 4;
 
     public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = EpollServerSocketChannel.class;
     public final static Class<? extends SocketChannel> SOCKET_CHANNEL = EpollSocketChannel.class;
