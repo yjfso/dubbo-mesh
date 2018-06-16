@@ -22,16 +22,16 @@ public class Const {
     public final static byte[] NULL = "null".getBytes();
     public final static byte[] VOID_JSON = "{}".getBytes();
 
-    public final static int LOAD_BALANCE_REFRESH_TIME = 3;
+    public final static int LOAD_BALANCE_REFRESH_TIME = 2;
 
     public final static int AGENT_REQUEST_NUM = 500;
     public final static int DUBBO_REQUEST_NUM = 300;
 
-    public final static int MAX_DUBBO_REQUEST = 190;
+    public final static int MAX_DUBBO_REQUEST = 185;
     public final static int CONSUMER_SER_BOSS = 1;
-    public final static int CONSUMER_SER_WORKER = 8;
+    public final static int CONSUMER_SER_WORKER = 16;
     public final static int PROVIDER_SER_BOSS = 1;
-    public final static int PROVIDER_SER_WORKER = 8;
+    public final static int PROVIDER_SER_WORKER = 16;
 
     public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = EpollServerSocketChannel.class;
     public final static Class<? extends SocketChannel> SOCKET_CHANNEL = EpollSocketChannel.class;
