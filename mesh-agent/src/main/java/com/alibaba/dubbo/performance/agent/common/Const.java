@@ -33,11 +33,11 @@ public class Const {
     public final static int PROVIDER_SER_BOSS = 1;
     public final static int PROVIDER_SER_WORKER = 8;
 
-//    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = EpollServerSocketChannel.class;
-//    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = EpollSocketChannel.class;
-//    public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = EpollEventLoopGroup.class;
+    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = EpollServerSocketChannel.class;
+    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = EpollSocketChannel.class;
+    public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = EpollEventLoopGroup.class;
 
-    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = KQueueServerSocketChannel.class;
-    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = KQueueSocketChannel.class;
-    public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = KQueueEventLoopGroup.class;
+//    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = KQueueServerSocketChannel.class;
+//    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = KQueueSocketChannel.class;
+//    public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = KQueueEventLoopGroup.class;
 }
