@@ -7,8 +7,11 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.kqueue.KQueueSocketChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
  * Created by yinjianfeng on 18/6/10.
@@ -33,9 +36,16 @@ public class Const {
     public final static int PROVIDER_SER_BOSS = 1;
     public final static int PROVIDER_SER_WORKER = 4;
 
+    public final static int SMART_WRITER_MAX_BUF = 50;
+    public final static int SMART_WRITER_INTERVAL = 20;
+
     public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = EpollServerSocketChannel.class;
     public final static Class<? extends SocketChannel> SOCKET_CHANNEL = EpollSocketChannel.class;
     public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = EpollEventLoopGroup.class;
+
+//    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = NioServerSocketChannel.class;
+//    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = NioSocketChannel.class;
+//    public final static Class<? extends EventLoopGroup> EVENT_LOOP_GROUP = NioEventLoopGroup.class;
 
 //    public final static Class<? extends ServerSocketChannel> SERVER_SOCKET_CHANNEL = KQueueServerSocketChannel.class;
 //    public final static Class<? extends SocketChannel> SOCKET_CHANNEL = KQueueSocketChannel.class;
