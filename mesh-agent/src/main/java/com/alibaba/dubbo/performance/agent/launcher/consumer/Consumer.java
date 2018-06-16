@@ -39,7 +39,7 @@ public class Consumer {
         try{
             int port = Integer.valueOf(System.getProperty("server.port"));
             ChannelFuture future = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(KQueueServerSocketChannel.class)
+                    .channel(Const.SERVER_SOCKET_CHANNEL)
                     .childHandler(new ConsumerInitializer())
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, false)
