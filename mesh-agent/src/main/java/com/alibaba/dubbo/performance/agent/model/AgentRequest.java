@@ -48,6 +48,7 @@ public class AgentRequest extends AbstractRequest {
 
     public void returnSelf() throws Exception{
         super.returnSelf();
+//        byteBufHolder = null;
         getPool().returnObject(this);
     }
 

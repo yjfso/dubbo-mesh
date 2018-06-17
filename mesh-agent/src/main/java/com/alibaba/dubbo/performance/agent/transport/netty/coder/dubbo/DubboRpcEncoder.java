@@ -66,6 +66,7 @@ public class DubboRpcEncoder extends ChannelOutboundHandlerAdapter {
             requestByteBuf.setInt(8, req.getId());
 
             encodeRequestData(req.getData(), requestByteBuf);
+            req.setData(null);
             int len = requestByteBuf.readableBytes() - HEADER_LENGTH;
             requestByteBuf.setInt(12, len);
 

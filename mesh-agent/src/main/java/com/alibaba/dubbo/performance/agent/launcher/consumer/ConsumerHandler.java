@@ -52,11 +52,11 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                     HttpMethod httpMethod = req.method();
                     if (HttpMethod.POST.equals(httpMethod) ) {
                         boolean keepAlive = HttpUtil.isKeepAlive(req);
-                        agentRequest.setByteBufHolder(req);
+//                        agentRequest.setByteBufHolder(req);
                         agentRequest.setChannelWriter(ctx);
                         agentRequest.setKeepAlive(keepAlive);
 
-                        ByteBuf buf = agentRequest.getByteBufHolder().content();
+                        ByteBuf buf = req.content();
                         compositeByteBuf.capacity(4);
                         compositeByteBuf.writeInt(agentRequest.getId());
                         compositeByteBuf.addComponent(true, buf);
