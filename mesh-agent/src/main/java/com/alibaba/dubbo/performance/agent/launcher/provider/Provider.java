@@ -48,7 +48,7 @@ public class Provider {
                     .childHandler(new ProviderInitializer())
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, false)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {

@@ -42,7 +42,7 @@ public class Consumer {
                     .channel(Const.SERVER_SOCKET_CHANNEL)
                     .childHandler(new ConsumerInitializer())
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, false)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {
