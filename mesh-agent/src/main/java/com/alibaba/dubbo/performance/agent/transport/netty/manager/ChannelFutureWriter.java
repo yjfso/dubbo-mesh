@@ -35,13 +35,13 @@ public class ChannelFutureWriter {
 
     public void smartWrite(Object object){
         if(channelFuture.isDone()){
-            channelFuture.channel().writeAndFlush(object, channelFuture.channel().voidPromise());
+            channelFuture.channel().write(object, channelFuture.channel().voidPromise());
         } else{
             channelFuture.addListener(
                     new ChannelFutureListener(){
                         @Override
                         public void operationComplete(ChannelFuture cf) throws Exception {
-                            cf.channel().writeAndFlush(object, cf.channel().voidPromise());
+                            cf.channel().write(object, cf.channel().voidPromise());
                             channelFuture.removeListener(this);
                         }
                     }

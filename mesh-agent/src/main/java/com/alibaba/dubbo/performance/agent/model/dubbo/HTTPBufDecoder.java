@@ -2,7 +2,6 @@ package com.alibaba.dubbo.performance.agent.model.dubbo;
 
 import com.alibaba.dubbo.performance.agent.common.Const;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +12,13 @@ import java.util.Map;
 public class HTTPBufDecoder {
 
     public static Map<String, ByteBuf> decode(ByteBuf byteBuf, int start){
-        return null;
+//        Map<String, byte[]> result = new HashMap<>();
+//        StringHolder stringHolder = new StringHolder();
+//        String key = "";
 //        byteBuf.forEachByte(
 //                item -> {
-//                    item ==
+//                    stringHolder.value = "";
+//                    item == Const.AND;
 //                    for (byte i = 0; i < item; i++) {
 //                    }
 //                    return false;
@@ -45,6 +47,7 @@ public class HTTPBufDecoder {
 //            result.put(nowKey, value);
 //        }
 //        return result;
+        return null;
     }
 
     private static byte[] decodeValue(String key, byte[] source, int start, int length){

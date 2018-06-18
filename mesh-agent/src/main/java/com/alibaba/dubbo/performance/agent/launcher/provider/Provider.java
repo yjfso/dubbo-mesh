@@ -49,7 +49,6 @@ public class Provider {
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {
