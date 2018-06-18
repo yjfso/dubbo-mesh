@@ -49,6 +49,7 @@ public class Endpoint {
                         .group(ctx.channel().eventLoop()).connect(getInetSocketAddress());
 //                        .sync()
 //                        .channel();
+                ChannelFutureWriter.putInstance(future);
                 threadChannel.set(future);
             } catch (Exception e){
                 log.error("create channel error", e);

@@ -1,6 +1,7 @@
 package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelFutureWriter;
 import com.alibaba.dubbo.performance.agent.util.ByteBufUtil;
 import com.alibaba.dubbo.performance.agent.util.Bytes;
 import io.netty.buffer.ByteBuf;

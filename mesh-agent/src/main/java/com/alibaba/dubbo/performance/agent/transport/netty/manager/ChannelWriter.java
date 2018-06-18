@@ -22,7 +22,7 @@ public class ChannelWriter {
 
     static {
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
-                ()-> channelWriterMap.values().stream().filter(
+                () -> channelWriterMap.values().stream().filter(
                         item -> item.pending>0
                 ).forEach(ChannelWriter::flushDelay),
                 Const.SMART_WRITER_INTERVAL,
@@ -35,8 +35,8 @@ public class ChannelWriter {
         this.ctx = ctx;
     }
 
-    public void smartWrite(ByteBuf byteBuf){
-        ctx.write(byteBuf, ctx.voidPromise());
+    public void smartWrite(Object object){
+        ctx.write(object, ctx.voidPromise());
         if (pending ++ >= Const.SMART_WRITER_MAX_BUF){
             pending = 0;
             ctx.flush();

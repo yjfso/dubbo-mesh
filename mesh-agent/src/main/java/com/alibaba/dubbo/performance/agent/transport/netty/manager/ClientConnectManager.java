@@ -38,6 +38,8 @@ public class ClientConnectManager extends AbstractConnectManager implements Conn
                 .option(ChannelOption.TCP_NODELAY, true)
 //                .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .option(ChannelOption.SO_RCVBUF, 1024 * 32)
+                .option(ChannelOption.SO_SNDBUF, 1024 * 32)
                 .channel(Const.SOCKET_CHANNEL)
                 .handler(channelInitializer);
     }

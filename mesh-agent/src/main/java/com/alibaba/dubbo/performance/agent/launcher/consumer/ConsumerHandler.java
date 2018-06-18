@@ -2,6 +2,7 @@ package com.alibaba.dubbo.performance.agent.launcher.consumer;
 
 import com.alibaba.dubbo.performance.agent.model.AgentRequest;
 
+import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelFutureWriter;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.ChannelWriter;
 import com.alibaba.dubbo.performance.agent.transport.netty.manager.Endpoint;
 import io.netty.buffer.ByteBuf;
@@ -61,7 +62,8 @@ public class ConsumerHandler extends ChannelInboundHandlerAdapter {
                         compositeByteBuf.writeInt(agentRequest.getId());
                         compositeByteBuf.addComponent(true, buf);
 
-                        ChannelWriter.writeAndFlush(channelFuture, compositeByteBuf);
+                        ChannelFutureWriter.getInstance(channelFuture).smartWrite(compositeByteBuf);
+//                        ChannelWriter.writeAndFlush(channelFuture, compositeByteBuf);
                         return;
                     }
                 }
