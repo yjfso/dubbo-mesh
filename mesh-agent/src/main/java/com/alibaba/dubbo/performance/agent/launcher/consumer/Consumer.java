@@ -43,7 +43,7 @@ public class Consumer {
                     .childHandler(new ConsumerInitializer())
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.MAX_MESSAGES_PER_READ, 200)
+                    .childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE)
                     .bind(new InetSocketAddress(port)).sync();
             future.channel().closeFuture().sync();
         } finally {
